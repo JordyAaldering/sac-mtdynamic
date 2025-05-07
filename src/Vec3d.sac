@@ -1,0 +1,55 @@
+module Vec3d;
+
+export all;
+
+struct Vec3d {
+    double x;
+    double y;
+    double z;
+};
+
+inline
+double l2norm(struct Vec3d a)
+{
+    x2 = _mul_SxS_(a.x, a.x);
+    y2 = _mul_SxS_(a.y, a.y);
+    z2 = _mul_SxS_(a.z, a.z);
+    xyz = _add_SxS_(_add_SxS_(x2, y2), z2);
+    return Math::sqrt(xyz);
+}
+
+inline
+struct Vec3d -(struct Vec3d a, struct Vec3d b)
+{
+    return Vec3d{ _sub_SxS_(a.x, b.x),
+                  _sub_SxS_(a.y, b.y),
+                  _sub_SxS_(a.z, b.z) };
+}
+
+inline
+struct Vec3d +(struct Vec3d a, struct Vec3d b)
+{
+    return Vec3d{ _add_SxS_(a.x, b.x),
+                  _add_SxS_(a.y, b.y),
+                  _add_SxS_(a.z, b.z) };
+}
+
+inline
+struct Vec3d[d:shp] +(struct Vec3d[d:shp] a, struct Vec3d[d:shp] b)
+{
+    return { iv ->  _sel_VxA_(iv, a) + _sel_VxA_(iv, b) | iv < shp };
+}
+
+inline
+struct Vec3d *(struct Vec3d a, double b)
+{
+    return Vec3d{ _mul_SxS_(a.x, b),
+                  _mul_SxS_(a.y, b),
+                  _mul_SxS_(a.z, b) };
+}
+
+inline
+struct Vec3d[d>0:shp] *(struct Vec3d[d:shp] a, double b)
+{
+    return { iv -> _sel_VxA_(iv, a) * b | iv < shp };
+}

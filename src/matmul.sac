@@ -1,0 +1,38 @@
+use Array: all;
+use Benchmarking: all;
+use CommandLine: all;
+use StdIO: all;
+
+noinline
+int[u,w] matmul (int[u,v] a, int[v,w] b)
+{
+    benchThis();
+
+    bT = { [i,j] -> b[j,i] | [i,j] < [w,v] };
+    return { [i,j] -> sum (a[i] * bT[j]) | [i,j] < [u,w] };
+}
+
+int main()
+{
+    iter = String::toi(argv(argc() - 2));
+    size = String::toi(argv(argc() - 1));
+
+    a = _reshape_VxA_([size,size], iota(size * size));
+    b = _reshape_VxA_([size,size], iota(size * size));
+
+    itime = getInterval("time", 1);
+    start(itime);
+
+    for (i = 0; i < iter; i += 1) {
+        a = matmul(a, b);
+    }
+
+    end(itime);
+    time, unit = returnResultUnit(itime);
+
+    fprintf(stderr, "a[1,1] = %lf\n", a[1,1]);
+    fprintf(stderr, "This took %f%s.\n", time, unit);
+    printf("%f\n", (1.0 * tod(size)) * tod(iter) / 1e9 / time);
+
+    return 0;
+}

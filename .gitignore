@@ -1,0 +1,8 @@
+.ipynb_checkpoints/
+host/
+tree/
+
+# Ignore benchmarking results for now; they are preliminary
+laptop/
+cn125/
+cn132/
