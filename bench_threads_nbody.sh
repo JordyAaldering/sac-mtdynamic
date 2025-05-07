@@ -5,7 +5,7 @@
 #SBATCH --nodelist=cn125
 #SBATCH --mem=0
 #SBATCH --cpus-per-task=16
-#SBATCH --time=1:00:00
+#SBATCH --time=4:00:00
 #SBATCH --output=bench_threads_nbody.out
 
 if [ "$#" -ne 3 ]; then
@@ -28,18 +28,18 @@ bench_numa()
 {
     ./start_server/fixed.sh $name/nbody_fixed_"$size"_$1.csv &
     sleep 1 # ensure that the server is running
-    numactl --interleave all -C $2 ./bin/nbody_mt -mt $1 $iter $size
+    numactl --interleave all ./bin/nbody_mt -mt $1 $iter $size
 }
 
 bench_bind()
 {
     ./start_server/fixed.sh $name/nbody_fixed_"$size"_$1.csv &
     sleep 1 # ensure that the server is running
-    ./bin/nbody_mt -mt_bind simple -mt $1 $iter $size
+    numactl -C 0-15 ./bin/nbody_mt -mt $1 $iter $size
 }
 
-bench_numa 1 "0"
-bench_numa 2 "0,8"
-bench_numa 4 "0,4,8,12"
-bench_numa 8 "0,2,4,6,8,10,12,14"
+bench_numa 1
+bench_numa 2
+bench_numa 4
+bench_numa 8
 bench_bind 16
