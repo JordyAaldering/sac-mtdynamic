@@ -24,22 +24,15 @@ mkdir -p $name
 
 make bin/matmul_mt || exit 1
 
-bench_numa()
+bench()
 {
     ./start_server/fixed.sh $name/matmul_fixed_"$size"_$1.csv &
     sleep 1 # ensure that the server is running
-    numactl --interleave all ./bin/matmul_mt -mt $1 $iter $size
+    numactl --interleave all -C $2 ./bin/matmul_mt -mt $1 $iter $size
 }
 
-bench_bind()
-{
-    ./start_server/fixed.sh $name/matmul_fixed_"$size"_$1.csv &
-    sleep 1 # ensure that the server is running
-    numactl -C 0-15 ./bin/matmul_mt -mt $1 $iter $size
-}
-
-bench_numa 1
-bench_numa 2
-bench_numa 4
-bench_numa 8
-bench_bind 16
+bench  1 "0"
+bench  2 "0,8"
+bench  4 "0,4,8,12"
+bench  8 "0,2,4,6,8,10,12,14"
+bench 16 "0-15"
