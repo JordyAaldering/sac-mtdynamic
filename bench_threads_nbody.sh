@@ -8,9 +8,8 @@
 #SBATCH --time=4:00:00
 #SBATCH --output=bench_threads_nbody.out
 
-if [ "$#" -ne 3 ]; then
-    printf "Usage: %s <name> <iter> <size>\n" "$0" >&2
-    printf "\t<name>: job name ['laptop', 'cn125', 'cn132']\n" >&2
+if [ "$#" -ne 2 ]; then
+    printf "Usage: %s <iter> <size>\n" "$0" >&2
     printf "\t<iter>: number of times to repeat the experiment\n" >&2
     printf "\t<size>: input matrix size\n" >&2
     exit 1
@@ -26,7 +25,7 @@ make bin/nbody_mt || exit 1
 
 bench()
 {
-    ./start_server/fixed.sh $name/nbody_fixed_"$size"_$1.csv &
+    ./start_server/fixed.sh &
     sleep 1 # ensure that the server is running
     numactl --interleave all -C $2 ./bin/nbody_mt -mt $1 $iter $size
 }

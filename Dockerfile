@@ -29,11 +29,9 @@ RUN curl -OL https://gitlab.sac-home.org/sac-group/sac-packages/-/raw/master/lat
     && rm stdlib-basic.deb
 
 # Install SaC energy measuring
-#RUN git clone --single-branch https://github.com/SacBase/sac-energy.git \
-#    && cd sac-energy \
-#    && git clone --single-branch https://github.com/SacBase/cmake-common.git \
-#    && cmake -B build \
-#    && cmake --build build
+RUN git clone --single-branch --recursive https://github.com/SacBase/sac-energy.git \
+    && cd sac-energy \
+    && make
 
 # Install dynamic adaptation controller
 RUN git clone --single-branch https://github.com/JordyAaldering/mtdynamic.git \

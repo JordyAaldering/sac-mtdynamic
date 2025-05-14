@@ -1,6 +1,6 @@
 SAC = sac2c
 SAC_FLAGS = -Xc -Ofast
-MT_FLAGS = -t mt_pth -mt_dynamic
+MT_FLAGS = -t mt_pth #-mt_dynamic
 
 all: bin/matmul_mt bin/flash_mt bin/nbody_mt
 

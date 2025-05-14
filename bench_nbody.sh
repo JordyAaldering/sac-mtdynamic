@@ -24,5 +24,4 @@ mkdir -p $name
 
 make bin/nbody_mt || exit 1
 
-./start_server/genetic.sh $name/adapt_genetic.csv &
-./bin/nbody_mt -mt 16 $iter $size
+./start_server/genetic.sh & ./bin/nbody_mt -mt 16 $iter $size

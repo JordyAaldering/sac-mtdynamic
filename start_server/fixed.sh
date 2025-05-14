@@ -1,8 +1,4 @@
-if [ "$#" -ne 1 ]; then
-    printf "Usage: %s <log-file>\n" "$0" >&2
-    exit 1
-fi
-
-../mtdynamic/target/release/single \
-    -c fixed -f energy -s 99999 \
-    --log-file $1
+../mtdynamic/target/release/server \
+    --single \
+    --letterbox-size 1 \
+    fixed

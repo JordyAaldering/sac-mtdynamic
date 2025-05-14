@@ -1,14 +1,20 @@
-use Array: all;
-use Benchmarking: all;
+use Array: all except { transpose };
 use CommandLine: all;
 use StdIO: all;
 
 noinline
-int[u,w] matmul (int[u,v] a, int[v,w] b)
+int[w,v] transpose(int[v,w] b)
 {
-    benchThis();
+    MTClock::touch(MTClock::TheMTClock);
 
-    bT = { [i,j] -> b[j,i] | [i,j] < [w,v] };
+    return { [i,j] -> b[j,i] | [i,j] < [w,v] };
+}
+
+noinline
+int[u,w] matmul(int[u,v] a, int[w,v] bT)
+{
+    MTClock::touch(MTClock::TheMTClock);
+
     return { [i,j] -> sum (a[i] * bT[j]) | [i,j] < [u,w] };
 }
 
@@ -17,22 +23,45 @@ int main()
     iter = String::toi(argv(argc() - 2));
     size = String::toi(argv(argc() - 1));
 
-    a = _reshape_VxA_([size,size], iota(size * size));
-    b = _reshape_VxA_([size,size], iota(size * size));
-
-    itime = getInterval("time", 1);
-    start(itime);
+    a = reshape([size,size], iota(size * size));
+    b = reshape([size,size], iota(size * size));
 
     for (i = 0; i < iter; i += 1) {
-        a = matmul(a, b);
+        rapl_start = Rapl::raplStart();
+        sec1, nsec1 = MTClock::gettime();
+
+        bT = transpose(b);
+
+        sec2, nsec2 = MTClock::gettime();
+        energy_uj = Rapl::raplStop(rapl_start);
+        sec = timediff(sec1, nsec1, sec2, nsec2);
+        t = Rapl::numThreads();
+        printf("transp,%d,%f,%f\n", t, sec, Rapl::tod(energy_uj));
+
+        rapl_start = Rapl::raplStart();
+        sec1, nsec1 = MTClock::gettime();
+
+        _res = matmul(a, bT);
+
+        sec2, nsec2 = MTClock::gettime();
+        energy_uj = Rapl::raplStop(rapl_start);
+        sec = timediff(sec1, nsec1, sec2, nsec2);
+        t = Rapl::numThreads();
+        printf("matmul,%d,%f,%f\n", t, sec, Rapl::tod(energy_uj));
     }
 
-    end(itime);
-    time, unit = returnResultUnit(itime);
-
-    fprintf(stderr, "a[1,1] = %lf\n", a[1,1]);
-    fprintf(stderr, "This took %f%s.\n", time, unit);
-    printf("%f\n", (1.0 * tod(size)) * tod(iter) / 1e9 / time);
-
     return 0;
+}
+
+double timediff(long sec1, long nsec1, long sec2, long nsec2)
+{
+    sec = sec2 - sec1;
+    nsec = nsec2 - nsec1;
+
+    if (nsec < 0l) {
+        nsec = nsec + 1000000000l;
+        sec = sec - 1l;
+    }
+
+    return tod(sec) + tod(nsec) / 1e9d;
 }

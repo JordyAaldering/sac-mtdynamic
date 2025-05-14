@@ -49,7 +49,7 @@ struct Vec3d *(struct Vec3d a, double b)
 }
 
 inline
-struct Vec3d[d>0:shp] *(struct Vec3d[d:shp] a, double b)
+struct Vec3d[d:shp] *(struct Vec3d[d:shp] a, double b)
 {
     return { iv -> _sel_VxA_(iv, a) * b | iv < shp };
 }
