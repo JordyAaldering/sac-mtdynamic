@@ -8,15 +8,19 @@
 #SBATCH --time=4:00:00
 #SBATCH --output=bench_threads_matmul.out
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
     printf "Usage: %s <iter> <size>\n" "$0" >&2
     printf "\t<iter>: number of times to repeat the experiment\n" >&2
     printf "\t<size>: input matrix size\n" >&2
+    printf '\t<outdir>: directory to store results\n' >&2
     exit 1
 fi
 
 iter="$1"
 size="$2"
+outdir=$3
+
+mkdir -p $outdir
 
 make bin/matmul_mt || exit 1
 
@@ -41,11 +45,11 @@ bench()
                 printf ",%f,%f", a[1,i], sqrt(q[1,i] / (NR / 2.0));
             }
             print "";
-        }'
+        }' >> "${outdir}/matmul.csv"
 }
 
-#bench  1 "0"
-#bench  2 "0,8"
-#bench  4 "0,4,8,12"
+bench  1 "0"
+bench  2 "0,8"
+bench  4 "0,4,8,12"
 bench  8 "0,2,4,6,8,10,12,14"
 bench 16 "0-15"
