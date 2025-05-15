@@ -15,14 +15,9 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-name="$1"
-iter="$2"
-size="$3"
-
-mkdir -p $name
+iter="$1"
+size="$2"
 
 make bin/matmul_mt || exit 1
 
 ./start_server/genetic.sh & ./bin/matmul_mt -mt 16 $iter $size
-./start_server/delta.sh & ./bin/matmul_mt -mt 16 $iter $size
-./start_server/corridor.sh & ./bin/matmul_mt -mt 16 $iter $size

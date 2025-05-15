@@ -8,19 +8,15 @@
 #SBATCH --time=1:00:00
 #SBATCH --output=bench_threads_nbody.out
 
-if [ "$#" -ne 3 ]; then
-    printf "Usage: %s <name> <iter> <size>\n" "$0" >&2
-    printf "\t<name>: job name ['laptop', 'cn125', 'cn132']\n" >&2
+if [ "$#" -ne 2 ]; then
+    printf "Usage: %s <iter> <size>\n" "$0" >&2
     printf "\t<iter>: number of times to repeat the experiment\n" >&2
     printf "\t<size>: input matrix size\n" >&2
     exit 1
 fi
 
-name="$1"
-iter="$2"
-size="$3"
-
-mkdir -p $name
+iter="$1"
+size="$2"
 
 make bin/nbody_mt || exit 1
 

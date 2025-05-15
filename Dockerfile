@@ -8,6 +8,12 @@ RUN apt update \
         cmake \
         curl \
         git \
+        # Additional SaC dependencies
+        xsltproc \
+        python3 \
+        bison \
+        flex \
+        m4 \
     && apt clean \
     && apt autoclean \
     && apt --purge autoremove
@@ -19,14 +25,18 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install SaC compiler
-RUN curl -OL https://gitlab.sac-home.org/sac-group/sac-packages/-/raw/master/latest/weekly/Ubl22/sac2c-basic.deb \
-    && apt install -y ./sac2c-basic.deb \
-    && rm sac2c-basic.deb
+RUN git clone --recursive --single-branch https://gitlab.sac-home.org/sac-group/sac2c.git \
+    && cd sac2c && mkdir build && cd build \
+    && cmake -DCMAKE_BUILD_TYPE=RELEASE .. \
+    && make -j4 \
+    && cp sac2c_p /usr/local/bin/sac2c \
+    && sac2c -V
 
 # Install SaC standard library
-RUN curl -OL https://gitlab.sac-home.org/sac-group/sac-packages/-/raw/master/latest/weekly/Ubl22/stdlib-basic.deb \
-    && apt install -y ./stdlib-basic.deb \
-    && rm stdlib-basic.deb
+RUN git clone --recursive --single-branch https://github.com/SacBase/Stdlib.git \
+    && cd Stdlib && mkdir build && cd build \
+    && cmake -DBUILD_EXT=OFF -DFULLTYPES=OFF -DTARGETS="seq;mt_pth" .. \
+    && make -j4
 
 # Install SaC energy measuring
 RUN git clone --single-branch --recursive https://github.com/SacBase/sac-energy.git \

@@ -4,10 +4,8 @@ import Array: { OVERLOADED };
 use Vec3d: all except { OVERLOADED };
 import Vec3d: { OVERLOADED };
 
-use Benchmarking: all;
 use CommandLine: all;
 use StdIO: all;
-use Math: all;
 
 #define EPSILON2 0x1p-53
 
@@ -33,7 +31,7 @@ struct Vec3d acc(struct Body b, struct Body b2)
 noinline
 struct Body[n] timeStep(struct Body[n] bs, double dt)
 {
-    benchThis();
+    MTClock::touch();
 
     acc = with {
             ([0] <= [i] < [n])
@@ -58,20 +56,11 @@ int main()
                              .mass = 1d }
              | [i] < [size] };
 
-    itime = getInterval("time", 1);
-    start(itime);
-
     for (i = 0; i < iter; i += 1) {
+        sec, nsec, rapl = Bench::start();
         bodies = timeStep(bodies, 0.01);
+        Bench::stop(sec, nsec, rapl);
     }
 
-    end(itime);
-    time, unit = returnResultUnit(itime);
-
-    fprintf(stderr, "First coordinate of first body is %lf\n",
-                    _sel_VxA_([0], bodies).pos.x);
-    fprintf(stderr, "This took %f%s.\n", time, unit);
-    printf("%f\n", (19.0 * tod(size) * tod(size) + 12.0 * tod(size)) * tod(iter) / 1e9 / time);
-
-    return 0;
+    return toi(_sel_VxA_([0], bodies).pos.x);
 }

@@ -1,14 +1,20 @@
 SAC = sac2c
 SAC_FLAGS = -Xc -Ofast
-MT_FLAGS = -t mt_pth #-mt_dynamic
+MT_FLAGS = -t mt_pth
 
 all: bin/matmul_mt bin/flash_mt bin/nbody_mt
 
-bin/matmul_mt: src/matmul.sac
+bin/%_mt: src/%.sac host/mt-pth/libBenchMod.so
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
 
-bin/nbody_mt: src/nbody.sac host/mt-pth/libVec3dMod.so
+bin/%_mtd: src/%.sac host/mt-pth/libBenchMod.so
+	$(SAC) ${MT_FLAGS} -mt_dynamic $(SAC_FLAGS) $< -o $@
+
+bin/nbody_mt: src/nbody.sac host/mt-pth/libBenchMod.so host/mt-pth/libVec3dMod.so
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
+
+bin/nbody_mtd: src/nbody.sac host/mt-pth/libBenchMod.so host/mt-pth/libVec3dMod.so
+	$(SAC) ${MT_FLAGS} -mt_dynamic $(SAC_FLAGS) $< -o $@
 
 host/mt-pth/lib%Mod.so: src/%.sac
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $<

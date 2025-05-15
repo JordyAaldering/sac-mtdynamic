@@ -5,7 +5,7 @@ use StdIO: all;
 noinline
 int[w,v] transpose(int[v,w] b)
 {
-    MTClock::touch(MTClock::TheMTClock);
+    MTClock::touch();
 
     return { [i,j] -> b[j,i] | [i,j] < [w,v] };
 }
@@ -13,9 +13,9 @@ int[w,v] transpose(int[v,w] b)
 noinline
 int[u,w] matmul(int[u,v] a, int[w,v] bT)
 {
-    MTClock::touch(MTClock::TheMTClock);
+    MTClock::touch();
 
-    return { [i,j] -> sum (a[i] * bT[j]) | [i,j] < [u,w] };
+    return { [i,j] -> sum(a[i] * bT[j]) | [i,j] < [u,w] };
 }
 
 int main()
@@ -27,41 +27,14 @@ int main()
     b = reshape([size,size], iota(size * size));
 
     for (i = 0; i < iter; i += 1) {
-        rapl_start = Rapl::raplStart();
-        sec1, nsec1 = MTClock::gettime();
-
+        sec, nsec, rapl = Bench::start();
         bT = transpose(b);
+        Bench::stop(sec, nsec, rapl);
 
-        sec2, nsec2 = MTClock::gettime();
-        energy_uj = Rapl::raplStop(rapl_start);
-        sec = timediff(sec1, nsec1, sec2, nsec2);
-        t = Rapl::numThreads();
-        printf("transp,%d,%f,%f\n", t, sec, Rapl::tod(energy_uj));
-
-        rapl_start = Rapl::raplStart();
-        sec1, nsec1 = MTClock::gettime();
-
+        sec, nsec, rapl = Bench::start();
         _res = matmul(a, bT);
-
-        sec2, nsec2 = MTClock::gettime();
-        energy_uj = Rapl::raplStop(rapl_start);
-        sec = timediff(sec1, nsec1, sec2, nsec2);
-        t = Rapl::numThreads();
-        printf("matmul,%d,%f,%f\n", t, sec, Rapl::tod(energy_uj));
+        Bench::stop(sec, nsec, rapl);
     }
 
-    return 0;
-}
-
-double timediff(long sec1, long nsec1, long sec2, long nsec2)
-{
-    sec = sec2 - sec1;
-    nsec = nsec2 - nsec1;
-
-    if (nsec < 0l) {
-        nsec = nsec + 1000000000l;
-        sec = sec - 1l;
-    }
-
-    return tod(sec) + tod(nsec) / 1e9d;
+    return a[0,0];
 }

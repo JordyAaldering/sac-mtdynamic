@@ -1,36 +1,28 @@
-#ifndef P
-#define P 1000
-#endif
-
-#ifndef ITER
-#define ITER 250
-#endif
-
-inline
-double +(double a, double b) { return _add_SxS_(a, b); }
-
-inline
-double sum(double[n] a)
-{
-    return with {
-        ([0] <= iv < [n]): _sel_VxA_(iv, a);
-    }: fold(+, 0.0);
-}
+use Array: all;
+use CommandLine: all;
+use StdIO: all;
 
 noinline
 double[u,w] matmul(double[u,v] a, double[v,w] b)
 {
-    return { [i,j] -> sum({ [k] -> _mul_SxS_(_sel_VxA_([i,k], a), _sel_VxA_([k,j], b)) }) };
+    MTClock::touch();
+
+    return { [i,j] -> sum({ [k] -> a[i,k] * b[k,j] }) };
 }
 
 int main()
 {
-    a = { [i,j] -> _tod_S_(i) | [i,j] < [P,P] };
-    b = { [i,j] -> _tod_S_(j) | [i,j] < [P,P] };
+    iter = String::toi(argv(argc() - 2));
+    size = String::toi(argv(argc() - 1));
 
-    for (i = 0; _lt_SxS_(i, ITER); i = _add_SxS_(i, 1)) {
+    a = tod(reshape([size,size], iota(size * size)));
+    b = tod(reshape([size,size], iota(size * size)));
+
+    for (i = 0; i < iter; i += 1) {
+        sec, nsec, rapl = Bench::start();
         a = matmul(a, b);
+        Bench::stop(sec, nsec, rapl);
     }
 
-    return _toi_S_(_sel_VxA_(_hideValue_SxA_(0, [0,0]), a));
+    return toi(a[0,0]);
 }
