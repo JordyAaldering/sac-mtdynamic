@@ -5,7 +5,7 @@
 #SBATCH --nodelist=cn125
 #SBATCH --mem=0
 #SBATCH --cpus-per-task=16
-#SBATCH --time=4:00:00
+#SBATCH --time=1:00:00
 #SBATCH --output=bench_threads_nbody.out
 
 if [ "$#" -ne 3 ]; then

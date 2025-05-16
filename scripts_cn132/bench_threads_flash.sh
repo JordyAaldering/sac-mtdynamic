@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #SBATCH --account=csmpi
-#SBATCH --partition=csmpi_long
-#SBATCH --nodelist=cn125
+#SBATCH --partition=csmpi_fpga_long
+#SBATCH --nodelist=cn132
 #SBATCH --mem=0
-#SBATCH --cpus-per-task=16
-#SBATCH --time=4:00:00
+#SBATCH --cpus-per-task=32
+#SBATCH --time=1:00:00
 #SBATCH --output=bench_threads_flash.out
 
 if [ "$#" -ne 4 ]; then
@@ -28,7 +28,7 @@ make bin/flash_mt || exit 1
 
 bench()
 {
-    numactl --interleave all -C $2 ./bin/flash_mt -mt $1 $iter $d $n \
+    numactl --interleave all ./bin/flash_mt -mt $1 $iter $d $n \
         | awk -v threads=$1 -v size=$(($d * $n)) '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
@@ -44,8 +44,9 @@ bench()
         }' >> "${outdir}/flash.csv"
 }
 
-bench 1 "0"
-bench 2 "0,8"
-bench 4 "0,4,8,12"
-bench 8 "0,2,4,6,8,10,12,14"
-bench 16 "0-15"
+bench 1
+bench 2
+bench 4
+bench 8
+bench 16
+bench 32

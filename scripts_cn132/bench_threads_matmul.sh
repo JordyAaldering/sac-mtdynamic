@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #SBATCH --account=csmpi
-#SBATCH --partition=csmpi_long
-#SBATCH --nodelist=cn125
+#SBATCH --partition=csmpi_fpga_long
+#SBATCH --nodelist=cn132
 #SBATCH --mem=0
-#SBATCH --cpus-per-task=16
-#SBATCH --time=4:00:00
+#SBATCH --cpus-per-task=32
+#SBATCH --time=1:00:00
 #SBATCH --output=bench_threads_matmul.out
 
 if [ "$#" -ne 3 ]; then
@@ -16,8 +16,8 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
-iter="$1"
-size="$2"
+iter=$1
+size=$2
 outdir=$3
 
 mkdir -p $outdir
@@ -26,7 +26,7 @@ make bin/matmul_mt || exit 1
 
 bench()
 {
-    numactl --interleave all -C $2 ./bin/matmul_mt -mt $1 $iter $size \
+    numactl --interleave all ./bin/matmul_mt -mt $1 $iter $size \
         | awk -v threads=$1 -v size=$size '{
             wl_idx = (NR - 1) % 2;
             for (i = 2; i <= NF; i++) {
@@ -48,8 +48,9 @@ bench()
         }' >> "${outdir}/matmul.csv"
 }
 
-bench 1 "0"
-bench 2 "0,8"
-bench 4 "0,4,8,12"
-bench 8 "0,2,4,6,8,10,12,14"
-bench 16 "0-15"
+bench 1
+bench 2
+bench 4
+bench 8
+bench 16
+bench 32
