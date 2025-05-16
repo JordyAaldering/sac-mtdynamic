@@ -3,13 +3,13 @@ use CommandLine: all;
 use StdIO: all;
 
 noinline
-double[u,v] stencil(double[u,v] arr, double[3,3] weights)
+double[u,v] stencil(double[u,v] arr, double[3,3] w)
 {
     MTClock::touch();
 
     return { [x,y] ->
-                sum({ [i,j] -> w[i,j] * arr[_mod_SxS_(P + x + (i - 1), u),
-                                            _mod_SxS_(P + y + (j - 1), v)] })
+                sum({ [i,j] -> w[i,j] * arr[_mod_SxS_(u + x + (i - 1), u),
+                                            _mod_SxS_(v + y + (j - 1), v)] })
            | [x,y] < [u,v] };
 }
 
