@@ -1,80 +1,60 @@
 use Array: all;
-use Benchmarking: all;
 use CommandLine: all;
 use StdIO: all;
 
 inline
-float maximum(float[d:shp] x)
-{
-    return with {
-        (0*shp <= iv < shp): x[iv];
-    }: fold(max, 0.0);
-}
-
-inline
 float[m,n] stabilise(float[m,n] x)
 {
-    return { [i] -> x[i] - maximum(x[i]) };
+    return { [i] -> x[i] - maxval(x[i])
+           | [i] < [m] };
 }
 
 inline
 float[d:shp] exp(float[d:shp] x)
 {
-    return { iv -> Math::exp(x[iv]) };
-}
-
-inline
-float[m,n] matmulT(float[m,k] A, float[n,k] B)
-{
-    return { [i,j] -> with {
-                        ([0] <= [p] < [k]): A[i,p] * B[j,p];
-                      }: fold(+, 0.0)
-           | [i,j] < [m,n]};
+    return { iv -> Math::exp(x[iv])
+           | iv < shp };
 }
 
 inline
 float[m,n] scale(float[m,n] x)
 {
-    return { [i] -> x[i] / with {
-                             ([0] <= [j] < [n]): x[i, j];
-                           }: fold(+, 0.0) };
+    return { [i] -> x[i] / sum(x)
+           | [i] < [m] };
 }
 
 inline
-float[Nd,d,d] FlashAttention(float[Nd,d,d] Q, float[N,d] K, float[N,d] V)
-    | (Nd == N / d)
+float[m,n] matmulT(float[m,k] a, float[n,k] bT)
 {
-    Vt = { [i, j] -> V[j, i] };
-    return { [i] -> matmulT(scale(exp(stabilise(matmulT(Q[i], K)))), Vt) };
+    return { [i,j] -> sum(a[i] * bT[j])
+           | [i,j] < [m,n] };
 }
 
-float L2(float[*] x)
+noinline
+float[Nd,d,d] FlashAttention(float[Nd,d,d] Q, float[N,d] K, float[N,d] V)
 {
-    return Math::sqrt(sum(x * x));
+    MTClock::touch();
+
+    Vt = transpose(V);
+    return { [i] -> matmulT(scale(exp(stabilise(matmulT(Q[i], K)))), Vt)
+           | [i] < [Nd] };
 }
 
 int main()
 {
+    iter = String::toi(argv(argc() - 3));
     d = String::toi(argv(argc() - 2));
-    N = String::toi(argv(argc() - 1));
-    fprintf(stderr, "Running with d = %d, N = %d\n", d, N);
+    n = String::toi(argv(argc() - 1));
 
-    Q = { [i, j, k] -> tof(1) / (tof(1) + tof(i)) | [i, j, k] < [N / d, d, d] };
-    K = { [i, j] -> tof(1) | [i, j] < [N, d] };
-    V = { [i, j] -> tof(1) | [i, j] < [N, d] };
+    Q = { [i, j, k] -> tof(1) / (tof(1) + tof(i)) | [i, j, k] < [n / d, d, d] };
+    K = { [i, j]    -> tof(1)                     | [i, j] < [n, d] };
+    V = { [i, j]    -> tof(1)                     | [i, j] < [n, d] };
 
-    itime = getInterval("time", 1);
-    start(itime);
+    for (i = 0; i < iter; i += 1) {
+        sec, nsec, rapl = Bench::start();
+        Q = FlashAttention(Q, K, V);
+        Bench::stop(sec, nsec, rapl);
+    }
 
-    O = FlashAttention(Q, K, V);
-
-    end(itime);
-    time, unit = returnResultUnit(itime);
-
-    fprintf(stderr, "L2 norm of output is %lf, should be %lf\n",
-                    L2(O), Math::sqrt(tof(d * N)));
-    fprintf(stderr, "This took %f%s.\n", time, unit);
-    printf("%f\n", 4d * tod(N) * tod(N) * (tod(d) + 1d) / time / 1e9, unit);
-
-    return 0;
+    return toi(Q[0,0,0]);
 }

@@ -3,11 +3,11 @@ use CommandLine: all;
 use StdIO: all;
 
 noinline
-double[u,w] matmul(double[u,v] a, double[v,w] b)
+double[u,w] matmul(double[u,k] a, double[k,w] b)
 {
     MTClock::touch();
 
-    return { [i,j] -> sum({ [k] -> a[i,k] * b[k,j] }) };
+    return { [i,j] -> sum({ [p] -> a[i,p] * b[p,j] }) };
 }
 
 int main()

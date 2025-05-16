@@ -34,7 +34,7 @@ bench()
                 a[i] = b[i];
             }
         } END {
-            printf "%d,%2d", size, threads;
+            printf "nbody,%d,%2d", size, threads;
             for (i = 2; i <= NF; i++) {
                 printf ",%f,%f", a[i], sqrt(q[i] / NR);
             }

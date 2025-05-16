@@ -3,19 +3,19 @@ use CommandLine: all;
 use StdIO: all;
 
 noinline
-int[w,v] transpose(int[v,w] b)
+int[n,k] transpose(int[k,n] b)
 {
     MTClock::touch();
 
-    return { [i,j] -> b[j,i] | [i,j] < [w,v] };
+    return { [i,j] -> b[j,i] | [i,j] < [n,k] };
 }
 
 noinline
-int[u,w] matmul(int[u,v] a, int[w,v] bT)
+int[m,n] matmulT(int[m,k] a, int[n,k] bT)
 {
     MTClock::touch();
 
-    return { [i,j] -> sum(a[i] * bT[j]) | [i,j] < [u,w] };
+    return { [i,j] -> sum(a[i] * bT[j]) | [i,j] < [m,n] };
 }
 
 int main()
@@ -32,7 +32,7 @@ int main()
         Bench::stop(sec, nsec, rapl);
 
         sec, nsec, rapl = Bench::start();
-        _res = matmul(a, bT);
+        _res = matmulT(a, bT);
         Bench::stop(sec, nsec, rapl);
     }
 

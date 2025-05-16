@@ -3,6 +3,7 @@ host/
 tree/
 
 # Ignore benchmarking results for now; they are preliminary
-laptop/
+laptop-performance/
+laptop-powersaver/
 cn125/
 cn132/
