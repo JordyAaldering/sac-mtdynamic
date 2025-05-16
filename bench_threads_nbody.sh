@@ -34,7 +34,7 @@ bench()
                 a[i] = b[i];
             }
         } END {
-            printf "nbody,%d,%2d", size, threads;
+            printf "nbody,%d,%d", size, threads;
             for (i = 2; i <= NF; i++) {
                 printf ",%f,%f", a[i], sqrt(q[i] / NR);
             }
@@ -42,8 +42,8 @@ bench()
         }' >> "${outdir}/nbody.csv"
 }
 
-bench  1 "0"
-bench  2 "0,8"
-bench  4 "0,4,8,12"
-bench  8 "0,2,4,6,8,10,12,14"
+bench 1 "0"
+bench 2 "0,8"
+bench 4 "0,4,8,12"
+bench 8 "0,2,4,6,8,10,12,14"
 bench 16 "0-15"

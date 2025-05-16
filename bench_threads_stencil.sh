@@ -28,28 +28,22 @@ bench()
 {
     numactl --interleave all -C $2 ./bin/stencil_mt -mt $1 $iter $size \
         | awk -v threads=$1 -v size=$size '{
-            wl_idx = (NR - 1) % 2;
             for (i = 2; i <= NF; i++) {
-                b[wl_idx,i] = a[wl_idx,i] + ($i - a[wl_idx,i]) / (NR / 2.0);
-                q[wl_idx,i] += ($i - a[wl_idx,i]) * ($i - b[wl_idx,i]);
-                a[wl_idx,i] = b[wl_idx,i];
+                b[i] = a[i] + ($i - a[i]) / NR;
+                q[i] += ($i - a[i]) * ($i - b[i]);
+                a[i] = b[i];
             }
         } END {
-            printf "transp,%d,%2d", size, threads;
+            printf "stencil,%d,%d", size, threads;
             for (i = 2; i <= NF; i++) {
-                printf ",%f,%f", a[0,i], sqrt(q[0,i] / (NR / 2.0));
-            }
-            print "";
-            printf "stencil,%d,%2d", size, threads;
-            for (i = 2; i <= NF; i++) {
-                printf ",%f,%f", a[1,i], sqrt(q[1,i] / (NR / 2.0));
+                printf ",%f,%f", a[i], sqrt(q[i] / NR);
             }
             print "";
         }' >> "${outdir}/stencil.csv"
 }
 
-bench  1 "0"
-bench  2 "0,8"
-bench  4 "0,4,8,12"
-bench  8 "0,2,4,6,8,10,12,14"
+bench 1 "0"
+bench 2 "0,8"
+bench 4 "0,4,8,12"
+bench 8 "0,2,4,6,8,10,12,14"
 bench 16 "0-15"
