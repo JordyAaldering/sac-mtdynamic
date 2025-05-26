@@ -42,8 +42,11 @@ bench()
         }' >> "results_sel265k/matmul.csv"
 }
 
+bench  25000000
 bench  50000000
+bench  75000000
 bench 100000000
+bench 125000000
 bench 150000000
 bench 200000000
 # End with the default value
