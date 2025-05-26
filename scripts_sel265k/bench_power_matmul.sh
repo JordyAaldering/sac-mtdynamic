@@ -1,13 +1,5 @@
 #!/bin/bash
 
-#SBATCH --account=csmpi
-#SBATCH --partition=csmpi_fpga_long
-#SBATCH --nodelist=cn132
-#SBATCH --mem=0
-#SBATCH --cpus-per-task=32
-#SBATCH --time=1:00:00
-#SBATCH --output=bench_threads_matmul.out
-
 if [ "$#" -ne 2 ]; then
     printf "Usage: %s <iter> <size>\n" "$0" >&2
     printf "\t<iter>: number of times to repeat the experiment\n" >&2
@@ -26,6 +18,8 @@ mkdir -p results_sel265k
 bench()
 {
     echo $1 > /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
+    echo $1 > /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
+
     numactl --interleave all ./bin/matmul_mt -mt 8 $iter $size \
         | awk -v size=$size '{
             wl_idx = (NR - 1) % 2;
