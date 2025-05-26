@@ -23,19 +23,19 @@ bench()
     numactl --interleave all ./bin/matmul_mt -mt 8 $iter $size \
         | awk -v size=$size '{
             wl_idx = (NR - 1) % 2;
-            for (i = 2; i <= NF; i++) {
+            for (i = 1; i <= NF; i++) {
                 b[wl_idx,i] = a[wl_idx,i] + ($i - a[wl_idx,i]) / (NR / 2.0);
                 q[wl_idx,i] += ($i - a[wl_idx,i]) * ($i - b[wl_idx,i]);
                 a[wl_idx,i] = b[wl_idx,i];
             }
         } END {
             printf "transp,%d", size;
-            for (i = 2; i <= NF; i++) {
+            for (i = 1; i <= NF; i++) {
                 printf ",%f,%f", a[0,i], sqrt(q[0,i] / (NR / 2.0));
             }
             print "";
             printf "matmul,%d", size;
-            for (i = 2; i <= NF; i++) {
+            for (i = 1; i <= NF; i++) {
                 printf ",%f,%f", a[1,i], sqrt(q[1,i] / (NR / 2.0));
             }
             print "";
