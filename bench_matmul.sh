@@ -24,7 +24,6 @@ make bin/matmul_mtd || exit 1
 ../mtdynamic/target/release/server \
     --single \
     --letterbox-size 20 \
-    --runtime-cutoff 0.01 \
     genetic \
         --score pareto \
         --survival-rate 0.75 \
