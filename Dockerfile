@@ -27,7 +27,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 # Install SaC compiler
 RUN git clone --recursive --single-branch https://gitlab.sac-home.org/sac-group/sac2c.git \
     && cd sac2c && mkdir build && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=RELEASE .. \
+    && cmake -DCMAKE_BUILD_TYPE=RELEASE -DCUDA=OFF -DDISTMEM=OFF -DDISTMEM_GASNET=OFF .. \
     && make -j4 \
     && cp sac2c_p /usr/local/bin/sac2c \
     && sac2c -V
