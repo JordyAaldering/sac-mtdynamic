@@ -36,8 +36,12 @@ bench()
         }' >> "results_sel265k/stencil.csv"
 }
 
+bench  15000000
 bench  25000000
-bench  50000000
+bench  35000000
+bench  45000000
+bench  55000000
+bench  65000000
 bench  75000000
 bench 100000000
 bench 125000000
