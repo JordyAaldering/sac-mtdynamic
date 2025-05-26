@@ -15,9 +15,10 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-iter="$1"
-size="$2"
+iter=$1
+size=$2
 
-make bin/nbody_mt || exit 1
+make clean
+make bin/nbody_mtd || exit 1
 
-./start_server/genetic.sh & ./bin/nbody_mt -mt 16 $iter $size
+./start_server/genetic.sh & ./bin/nbody_mtd -mt 16 $iter $size

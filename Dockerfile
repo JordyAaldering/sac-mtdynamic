@@ -8,6 +8,7 @@ RUN apt update \
         cmake \
         curl \
         git \
+        nano \
         # Additional SaC dependencies
         xsltproc \
         python3 \
