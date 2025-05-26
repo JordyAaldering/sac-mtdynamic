@@ -41,7 +41,3 @@ bench  50000000
 bench  75000000
 bench 100000000
 bench 125000000
-bench 150000000
-bench 200000000
-# End with the default value
-bench 250000000
