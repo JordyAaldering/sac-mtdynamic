@@ -21,6 +21,14 @@ size=$2
 make clean
 make bin/matmul_mtd || exit 1
 
-./start_server/genetic.sh &
+../mtdynamic/target/release/server \
+    --single \
+    --letterbox-size 20 \
+    --runtime-cutoff 0.01 \
+    genetic \
+        --score pareto \
+        --survival-rate 0.75 \
+        --mutation-rate 0.25 \
+        --immigration-rate 0.0 &
 sleep 2 # Wait for the server to be running
 ./bin/matmul_mtd -mt 16 $iter $size
