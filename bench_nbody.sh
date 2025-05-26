@@ -21,4 +21,6 @@ size=$2
 make clean
 make bin/nbody_mtd || exit 1
 
-./start_server/genetic.sh & ./bin/nbody_mtd -mt 16 $iter $size
+./start_server/genetic.sh &
+sleep 2 # Wait for the server to be running
+./bin/nbody_mtd -mt 16 $iter $size
