@@ -20,5 +20,5 @@ void stop(long sec_from, long nsec_from, longlong[.] rapl)
 
     time = MTClock::timediff(sec_from, nsec_from, sec_to, nsec_to);
     energy = Rapl::tod(energy_uj);
-    printf("%d %f %f\n", Rapl::numThreads(), time, energy);
+    printf("%d %f %f\n", Rapl::numThreads(), Rapl::constraint_0_power_limit_uw(), time, energy);
 }
