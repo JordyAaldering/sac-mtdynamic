@@ -22,11 +22,12 @@ outdir=$3
 
 mkdir -p $outdir
 
+make clean
 make bin/stencil_mt || exit 1
 
 bench()
 {
-    numactl --interleave all -C $2 ./bin/stencil_mt -mt $1 $iter $size \
+    numactl --interleave all ./bin/stencil_mt -mt $1 $iter $size \
         | awk -v threads=$1 -v size=$size '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;

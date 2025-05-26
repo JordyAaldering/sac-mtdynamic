@@ -22,6 +22,7 @@ outdir=$3
 
 mkdir -p $outdir
 
+make clean
 make bin/stencil_mt || exit 1
 
 bench()

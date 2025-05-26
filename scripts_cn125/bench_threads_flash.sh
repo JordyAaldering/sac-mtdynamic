@@ -24,6 +24,7 @@ outdir=$4
 
 mkdir -p $outdir
 
+make clean
 make bin/flash_mt || exit 1
 
 bench()
