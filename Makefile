@@ -17,6 +17,9 @@ bin/nbody_mt: src/nbody.sac host/mt-pth/libBenchMod.so host/mt-pth/libVec3dMod.s
 bin/nbody_mtd: src/nbody.sac host/mt-pth/libBenchMod.so host/mt-pth/libVec3dMod.so
 	$(SAC) ${MT_FLAGS} -mt_dynamic $(SAC_FLAGS) $< -o $@
 
+host/seq/lib%Mod.so: src/%.sac
+	$(SAC) $(SAC_FLAGS) $<
+
 host/mt-pth/lib%Mod.so: src/%.sac
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $<
 
