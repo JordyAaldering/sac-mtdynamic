@@ -20,7 +20,7 @@ bench()
     echo $2 > /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
     echo $2 > /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
 
-    numactl -C 0-$(($1-1)) ./bin/stencil_mt -mt 8 $iter $size \
+    numactl -C 0-$(($1-1)) ./bin/stencil_mt -mt $1 $iter $size \
         | awk -v size=$size -v threads=$1 -v powercap=$2 '{
             for (i = 3; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
