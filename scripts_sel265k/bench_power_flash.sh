@@ -13,9 +13,31 @@ d=$2
 n=$3
 
 make clean
+make bin/flash_seq || exit 1
 make bin/flash_mt || exit 1
 
 mkdir -p results_sel265k
+
+bench_seq()
+{
+    echo $1 > /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
+    echo $1 > /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
+
+    ./bin/flash_seq $iter $d $n \
+        | awk -v size=$(($d * $n)) -v threads=1 -v powercap=$1 '{
+            for (i = 3; i <= NF; i++) {
+                b[i] = a[i] + ($i - a[i]) / NR;
+                q[i] += ($i - a[i]) * ($i - b[i]);
+                a[i] = b[i];
+            }
+        } END {
+            printf "flash,%d,%d,%d", size, threads, powercap;
+            for (i = 3; i <= NF; i++) {
+                printf ",%f,%f", a[i], sqrt(q[i] / NR);
+            }
+            print "";
+        }' >> "results_sel265k/flash.csv"
+}
 
 bench()
 {
@@ -37,6 +59,17 @@ bench()
             print "";
         }' >> "results_sel265k/flash.csv"
 }
+
+# Sequential
+bench_seq  15000000
+bench_seq  25000000
+bench_seq  35000000
+bench_seq  45000000
+bench_seq  55000000
+bench_seq  65000000
+bench_seq  75000000
+bench_seq 100000000
+bench_seq 125000000
 
 # Use only performance cores
 bench 8  15000000
