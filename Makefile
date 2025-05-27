@@ -2,7 +2,8 @@ SAC = sac2c
 SAC_FLAGS = -Xc -Ofast
 MT_FLAGS = -t mt_pth
 
-all: bin/matmul_mt bin/flash_mt bin/nbody_mt
+bin/%_seq: src/%.sac host/seq/libBenchMod.so
+	$(SAC) $(SAC_FLAGS) $< -o $@
 
 bin/%_mt: src/%.sac host/mt-pth/libBenchMod.so
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
