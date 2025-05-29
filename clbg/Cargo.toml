@@ -1,0 +1,50 @@
+[package]
+name = "clbg"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "clbg"
+
+[[bin]]
+name = "binary-trees"
+path = "src/binary_trees.rs"
+
+[[bin]]
+name = "fannkuch-redux"
+path = "src/fannkuch_redux.rs"
+
+[[bin]]
+name = "fasta"
+path = "src/fasta.rs"
+
+[[bin]]
+name = "k-nucleotide"
+path = "src/k_nucleotide.rs"
+
+[[bin]]
+name = "mandelbrot"
+path = "src/mandelbrot.rs"
+
+[[bin]]
+name = "n-body"
+path = "src/nbody.rs"
+
+[[bin]]
+name = "regex-redux"
+path = "src/regex_redux.rs"
+
+[[bin]]
+name = "reverse-complement"
+path = "src/reverse_complement.rs"
+
+[[bin]]
+name = "spectral-norm"
+path = "src/spectral_norm.rs"
+
+[dependencies]
+bumpalo = "3.17.0"
+num_cpus = "1.16.0"
+rapl-energy = { git = "https://github.com/JordyAaldering/rapl-energy.git" }
+rayon = "1.10.0"
+regex = "1.11.1"
