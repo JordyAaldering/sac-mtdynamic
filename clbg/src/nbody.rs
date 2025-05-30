@@ -158,45 +158,47 @@ const STARTING_STATE: [Body; BODIES_COUNT] = [
 ];
 
 /// Steps the simulation forward by one time-step.
-fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, steps: usize) {
+fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
     let mut d_positions: [Vec3D; INTERACTIONS] = Default::default();
     let mut magnitudes = [0.; INTERACTIONS];
 
     let mut mtd = clbg::DynamicRegion::init();
 
-    for _ in 0 .. steps {
+    for _ in 0..ncycles {
         mtd.region_start();
 
-        // Vectors between each pair of bodies.
-        let mut k = 0;
-        for (i, body1) in bodies.iter().enumerate() {
-            for body2 in &bodies[i + 1 ..] {
-                d_positions[k] = &body1.position - &body2.position;
-                k += 1;
+        for _ in 0..1000 {
+            // Vectors between each pair of bodies.
+            let mut k = 0;
+            for (i, body1) in bodies.iter().enumerate() {
+                for body2 in &bodies[i + 1 ..] {
+                    d_positions[k] = &body1.position - &body2.position;
+                    k += 1;
+                }
             }
-        }
 
-        // Magnitude between each pair of bodies.
-        for (mag, d_pos) in magnitudes.iter_mut().zip(d_positions.iter()) {
-            *mag = d_pos.magnitude(dt);
-        };
+            // Magnitude between each pair of bodies.
+            for (mag, d_pos) in magnitudes.iter_mut().zip(d_positions.iter()) {
+                *mag = d_pos.magnitude(dt);
+            };
 
-        // Apply every other body's gravitation to each body's velocity.
-        let mut k = 0;
-        for i in 0 .. BODIES_COUNT - 1 {
-            let (body1, rest) = bodies[i..].split_first_mut().unwrap();
-            for body2 in rest {
-                let d_pos       = &d_positions[k];
-                let mag         = magnitudes[k];
-                body1.velocity -= d_pos * (body2.mass * mag);
-                body2.velocity += d_pos * (body1.mass * mag);
-                k += 1;
+            // Apply every other body's gravitation to each body's velocity.
+            let mut k = 0;
+            for i in 0 .. BODIES_COUNT - 1 {
+                let (body1, rest) = bodies[i..].split_first_mut().unwrap();
+                for body2 in rest {
+                    let d_pos       = &d_positions[k];
+                    let mag         = magnitudes[k];
+                    body1.velocity -= d_pos * (body2.mass * mag);
+                    body2.velocity += d_pos * (body1.mass * mag);
+                    k += 1;
+                }
             }
-        }
 
-        // Update positions
-        for body in bodies.iter_mut() {
-            body.position += &body.velocity * dt;
+            // Update positions
+            for body in bodies.iter_mut() {
+                body.position += &body.velocity * dt;
+            }
         }
 
         mtd.region_end();
@@ -234,7 +236,7 @@ fn main() {
         .nth(1)
         .and_then(|s| s.into_string().ok())
         .and_then(|n| n.parse().ok())
-        .unwrap_or(1000);
+        .unwrap_or(1);
 
     let mut bodies = STARTING_STATE;
 
