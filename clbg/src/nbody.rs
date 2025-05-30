@@ -167,7 +167,7 @@ fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
     for _ in 0..ncycles {
         mtd.region_start();
 
-        for _ in 0..1000 {
+        for _ in 0..10000 {
             // Vectors between each pair of bodies.
             let mut k = 0;
             for (i, body1) in bodies.iter().enumerate() {
