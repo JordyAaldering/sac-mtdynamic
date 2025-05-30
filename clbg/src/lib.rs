@@ -1,4 +1,4 @@
-use std::{io::{Read, Write}, os::unix::net::UnixStream, time::Instant};
+use std::{fs::OpenOptions, io::{Read, Write}, os::unix::net::UnixStream, time::Instant};
 
 use rapl_energy::{Probe, Rapl};
 
@@ -36,9 +36,24 @@ impl DynamicRegion {
     pub fn region_end(&mut self) {
         let runtime = self.now.elapsed();
         let energy = self.rapl.elapsed();
-        let msg = create_sample(runtime.as_secs_f32(), energy.values().sum());
+
+        let runtime = runtime.as_secs_f32();
+        let energy = energy.values().sum();
+        let msg = create_sample(runtime, energy);
         self.stream.write_all(&msg).unwrap();
+
+        println!("{} {} {}", get_powercap(), runtime, energy);
     }
+}
+
+fn get_powercap() -> u64 {
+    let path = "/sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw";
+    let mut file = OpenOptions::new().read(true).open(path).unwrap();
+    let mut buf = String::new();
+    file.read_to_string(&mut buf).unwrap();
+    // Parse buffer
+    let buf = buf.trim();
+    buf.parse().unwrap()
 }
 
 fn create_sample(runtime: f32, energy: f32) -> [u8; 16] {
