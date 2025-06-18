@@ -162,10 +162,8 @@ fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
     let mut d_positions: [Vec3D; INTERACTIONS] = Default::default();
     let mut magnitudes = [0.; INTERACTIONS];
 
-    let mut mtd = clbg::DynamicRegion::init();
-
     for _ in 0..ncycles {
-        mtd.region_start();
+        let mtd_start = clbg::region_start();
 
         for _ in 0..10000 {
             // Vectors between each pair of bodies.
@@ -201,7 +199,7 @@ fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
             }
         }
 
-        mtd.region_end();
+        clbg::region_stop(mtd_start);
     }
 }
 

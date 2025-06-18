@@ -1,5 +1,5 @@
 ../mtdynamic/target/release/server \
-    --single \
+    --once \
     --letterbox-size 20 \
     delta \
         --score energy \
