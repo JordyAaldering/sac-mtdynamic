@@ -1,0 +1,23 @@
+[package]
+name = "clbg"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "shared"
+
+[[bin]]
+name = "matmul-naive"
+path = "src/matmul_naive.rs"
+
+[[bin]]
+name = "matmul-transpose"
+path = "src/matmul_transpose.rs"
+
+[[bin]]
+name = "n-body"
+path = "src/nbody.rs"
+
+[dependencies]
+rapl-energy = { git = "https://github.com/JordyAaldering/rapl-energy.git" }
+rayon = "1.10.0"

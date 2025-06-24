@@ -6,6 +6,11 @@ static STREAM: LazyLock<Mutex<UnixStream>> = LazyLock::new(|| {
     Mutex::new(UnixStream::connect("/tmp/mtd_letterbox").unwrap())
 });
 
+// TODO: create a wrapper around an existing iterator, provide `next` for n milliseconds,
+// and once in a while update the controller. We have the number of iterations so we can
+// ensure that our measuring period is long enough, even if each iteration takes only
+// a fraction of time.
+
 /// First send a signal that we are at the start of a parallel region.
 /// We don't actually care about the thread-count that we receive back.
 pub fn region_start() -> (Instant, Rapl) {

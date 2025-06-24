@@ -1,8 +1,3 @@
-/// The Computer Language Benchmarks Game
-/// https://salsa.debian.org/benchmarksgame-team/benchmarksgame/
-///
-/// Contributed by Ilia Schelokov
-
 use std::f64::consts::PI;
 use std::ops::{Add, Sub, Mul, AddAssign, SubAssign};
 use std::default::Default;
@@ -163,7 +158,7 @@ fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
     let mut magnitudes = [0.; INTERACTIONS];
 
     for _ in 0..ncycles {
-        let mtd_start = clbg::region_start();
+        let mtd_start = shared::region_start();
 
         for _ in 0..10000 {
             // Vectors between each pair of bodies.
@@ -199,7 +194,7 @@ fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
             }
         }
 
-        clbg::region_stop(mtd_start);
+        shared::region_stop(mtd_start);
     }
 }
 
