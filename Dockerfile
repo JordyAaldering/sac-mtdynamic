@@ -1,4 +1,4 @@
-FROM sacbase/sac-compiler
+FROM ubuntu:25.04
 
 RUN apt update \
     && apt install -y --no-install-recommends \
@@ -8,6 +8,13 @@ RUN apt update \
         cmake \
         curl \
         git \
+        nano \
+        # Additional SaC dependencies
+        xsltproc \
+        python3 \
+        bison \
+        flex \
+        m4 \
     && apt clean \
     && apt autoclean \
     && apt --purge autoremove
@@ -18,16 +25,26 @@ WORKDIR /home/ubuntu
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Check for changes on remote
-ADD "https://api.github.com/repos/JordyAaldering/mtdynamic/commits?per_page=1" latest_commit
-# Install dynamic adaptation controller
-RUN git clone --single-branch https://github.com/JordyAaldering/mtdynamic.git \
-    && cd mtdynamic \
-    && make
+# Install SaC compiler
+RUN git clone --recursive --single-branch https://gitlab.sac-home.org/sac-group/sac2c.git \
+    && cd sac2c && mkdir build && cd build \
+    && cmake -DCMAKE_BUILD_TYPE=RELEASE -DCUDA=OFF -DDISTMEM=OFF -DDISTMEM_GASNET=OFF .. \
+    && make -j4 \
+    && cp sac2c_p /usr/local/bin/sac2c \
+    && sac2c -V
 
-# Check for changes on remote
-ADD "https://api.github.com/repos/SacBase/sac-energy/commits?per_page=1" latest_commit
+# Install SaC standard library
+RUN git clone --recursive --single-branch https://github.com/SacBase/Stdlib.git \
+    && cd Stdlib && mkdir build && cd build \
+    && cmake -DBUILD_EXT=OFF -DFULLTYPES=OFF -DTARGETS="seq;mt_pth" .. \
+    && make -j4
+
 # Install SaC energy measuring
 RUN git clone --single-branch --recursive https://github.com/SacBase/sac-energy.git \
     && cd sac-energy \
+    && make
+
+# Install dynamic adaptation controller
+RUN git clone --single-branch https://github.com/JordyAaldering/mtdynamic.git \
+    && cd mtdynamic \
     && make
