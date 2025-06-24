@@ -1,7 +1,7 @@
 ## Building the container and removing outdated dangling versions
 
 ```
-docker build -t mtdynamic .
+docker build --no-cache -t mtdynamic .
 docker image prune
 ```
 
