@@ -1,7 +1,7 @@
 ## Building the container and removing outdated dangling versions
 
 ```
-docker build --no-cache -t mtdynamic .
+docker build -t mtdynamic .
 docker image prune
 ```
 
@@ -9,7 +9,8 @@ docker image prune
 
 ```
 docker run -it --rm --name=mtdynamic \
-    --mount type=bind,source=${PWD},target=/home/ubuntu \
-    --mount type=bind,source=/sys/devices/virtual/powercap/intel-rapl/intel-rapl:0,target=/sys/devices/virtual/powercap/intel-rapl/intel-rapl:0 \
+    --mount type=bind,source=${PWD},target=/home/ubuntu/sac-mtdynamic \
+    --mount type=bind,source=/sys/class/powercap/intel-rapl,target=/sys/class/powercap/intel-rapl \
+    --privileged \
     mtdynamic
 ```

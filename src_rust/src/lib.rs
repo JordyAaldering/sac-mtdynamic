@@ -50,7 +50,7 @@ pub fn region_stop((now, rapl): (Instant, Rapl)) {
 }
 
 fn get_powercap() -> u64 {
-    let path = "/sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw";
+    let path = "/sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw";
     if let Ok(mut file) = OpenOptions::new().read(true).open(path) {
         let mut buf = String::new();
         file.read_to_string(&mut buf).unwrap();

@@ -17,8 +17,8 @@ mkdir -p results_sel265k
 
 bench()
 {
-    echo $2 > /sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
-    echo $2 > /sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
+    echo $2 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
+    echo $2 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     numactl -C 0-$(($1-1)) ./bin/matmul_naive_mt -mt $1 $iter $size \
         | awk -v size=$size -v threads=$1 -v powercap=$2 '{
