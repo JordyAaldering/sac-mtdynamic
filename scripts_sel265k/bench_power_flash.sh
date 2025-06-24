@@ -20,8 +20,8 @@ mkdir -p results_sel265k
 
 bench_seq()
 {
-    echo $1 > /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
-    echo $1 > /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
+    echo $1 > /sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
+    echo $1 > /sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     ./bin/flash_seq $iter $d $n \
         | awk -v size=$(($d * $n)) -v threads=1 -v powercap=$1 '{
@@ -41,8 +41,8 @@ bench_seq()
 
 bench()
 {
-    echo $2 > /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
-    echo $2 > /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
+    echo $2 > /sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
+    echo $2 > /sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     numactl -C 0-$(($1-1)) ./bin/flash_mt -mt $1 $iter $d $n \
         | awk -v size=$(($d * $n)) -v threads=$1 -v powercap=$2 '{
