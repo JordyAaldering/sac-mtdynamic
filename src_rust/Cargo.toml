@@ -23,5 +23,6 @@ name = "stencil"
 path = "src/stencil.rs"
 
 [dependencies]
+controller = { git = "https://github.com/JordyAaldering/mtdynamic.git" }
 rapl-energy = { git = "https://github.com/JordyAaldering/rapl-energy.git" }
 rayon = "1.10.0"

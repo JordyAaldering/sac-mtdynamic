@@ -2,6 +2,8 @@ use std::f64::consts::PI;
 use std::ops::{Add, Sub, Mul, AddAssign, SubAssign};
 use std::default::Default;
 
+use shared::MtdIterator;
+
 #[derive(Clone, Debug)]
 struct Vec3D(f64, f64, f64);
 
@@ -157,8 +159,7 @@ fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
     let mut d_positions: [Vec3D; INTERACTIONS] = Default::default();
     let mut magnitudes = [0.; INTERACTIONS];
 
-    for _ in 0..ncycles {
-        let mtd_start = shared::region_start();
+    for _ in MtdIterator::new(0..ncycles) {
 
         for _ in 0..10000 {
             // Vectors between each pair of bodies.
@@ -193,8 +194,6 @@ fn advance(bodies: &mut [Body; BODIES_COUNT], dt: f64, ncycles: usize) {
                 body.position += &body.velocity * dt;
             }
         }
-
-        shared::region_stop(mtd_start);
     }
 }
 

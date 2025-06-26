@@ -12,7 +12,7 @@ size=$2
 
 (
 cd src_rust
-cargo build --release
+cargo build
 )
 
 ./start_server/genetic.sh &

@@ -1,70 +1,100 @@
-use std::{fs::OpenOptions, io::{Read, Write}, os::unix::net::UnixStream, sync::{LazyLock, Mutex}, time::Instant};
+use std::{
+    fs::OpenOptions,
+    io::{Read, Write},
+    os::unix::net::UnixStream,
+    sync::atomic::AtomicI32,
+    time::Instant,
+};
 
+use controller::{Request, Sample};
 use rapl_energy::{Probe, Rapl};
 
-static STREAM: LazyLock<Mutex<UnixStream>> = LazyLock::new(|| {
-    Mutex::new(UnixStream::connect("/tmp/mtd_letterbox").unwrap())
-});
+static COUNTER: AtomicI32 = AtomicI32::new(0);
 
-// TODO: create a wrapper around an existing iterator, provide `next` for n milliseconds,
-// and once in a while update the controller. We have the number of iterations so we can
-// ensure that our measuring period is long enough, even if each iteration takes only
-// a fraction of time.
-
-/// First send a signal that we are at the start of a parallel region.
-/// We don't actually care about the thread-count that we receive back.
-pub fn region_start() -> (Instant, Rapl) {
-    let mut stream = STREAM.lock().unwrap();
-
-    let msg = [0u8; 8];
-    stream.write_all(&msg).unwrap();
-
-    let mut buf = [0u8; 4];
-    stream.read_exact(&mut buf).unwrap();
-
-    let rapl = Rapl::now(false).unwrap();
-    let now = Instant::now();
-    (now, rapl)
+pub struct MtdIterator<I: Iterator> {
+    inner: I,
+    stream: UnixStream,
+    region_uid: i32,
+    region_start: Option<(Instant, Rapl)>,
 }
 
-/// Signal an end of the region and send runtime and energy results.
-pub fn region_stop((now, rapl): (Instant, Rapl)) {
-    let runtime = now.elapsed();
-    let energy = rapl.elapsed();
-
-    let runtime = runtime.as_secs_f32();
-    let energy = energy.values().sum();
-    let powercap = get_powercap();
-
-    let msg = create_sample(runtime, energy);
-    {
-        let mut stream = STREAM.lock().unwrap();
-        stream.write_all(&msg).unwrap();
+impl<I: Iterator> MtdIterator<I> {
+    pub fn new(inner: I) -> Self {
+        let counter = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        Self {
+            inner,
+            stream: UnixStream::connect("/tmp/mtd_letterbox").unwrap(),
+            region_uid: counter,
+            region_start: None,
+        }
     }
 
-    println!("{} {} {}", powercap, runtime, energy);
+    /// First send a signal that we are at the start of a parallel region.
+    /// We don't actually care about the thread-count that we receive back.
+    fn region_start(&mut self) -> (Instant, Rapl) {
+        self.stream.write_all(&Request {
+            region_uid: self.region_uid,
+            problem_size: 0,
+        }.to_bytes()).unwrap();
+
+        let mut buf = [0u8; 4];
+        self.stream.read_exact(&mut buf).unwrap();
+
+        let rapl = Rapl::now(false).unwrap();
+        let now = Instant::now();
+        (now, rapl)
+    }
+
+    /// Signal an end of the region and send runtime and energy results.
+    fn region_stop(&mut self, (now, rapl): (Instant, Rapl)) {
+        let runtime = now.elapsed();
+        let energy = rapl.elapsed();
+        let runtime = runtime.as_secs_f32();
+        let energy = energy.values().sum();
+        let powercap = get_powercap();
+
+        self.stream.write_all(&Sample {
+            region_uid: self.region_uid,
+            runtime,
+            usertime: 0.0,
+            energy,
+        }.to_bytes()).unwrap();
+
+        println!("{} {:.9} {:.9}", powercap, runtime, energy);
+    }
+}
+
+impl<I: Iterator> Iterator for MtdIterator<I> {
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.inner.next();
+
+        if item.is_some() {
+            if let Some(region_start) = self.region_start.take() {
+                // Send results of the previous region
+                self.region_stop(region_start);
+            } else {
+                // First element; do nothing
+            }
+
+            self.region_start = Some(self.region_start());
+        } else {
+            // Last element; close connection
+            self.stream.shutdown(std::net::Shutdown::Both).unwrap();
+        }
+
+        item
+    }
 }
 
 fn get_powercap() -> u64 {
-    let path = "/sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw";
-    if let Ok(mut file) = OpenOptions::new().read(true).open(path) {
+    const PATH: &str = "/sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw";
+    if let Ok(mut file) = OpenOptions::new().read(true).open(PATH) {
         let mut buf = String::new();
         file.read_to_string(&mut buf).unwrap();
-        // Parse buffer
-        let buf = buf.trim();
-        buf.parse().unwrap()
+        buf.trim().parse().unwrap()
     } else {
         0
     }
-}
-
-fn create_sample(runtime: f32, energy: f32) -> [u8; 16] {
-    let [i0, i1, i2, i3] = 0i32.to_ne_bytes();
-    let [r0, r1, r2, r3] = runtime.to_ne_bytes();
-    let [u0, u1, u2, u3] = 0f32.to_ne_bytes();
-    let [e0, e1, e2, e3] = energy.to_ne_bytes();
-    [i0, i1, i2, i3,
-     r0, r1, r2, r3,
-     u0, u1, u2, u3,
-     e0, e1, e2, e3]
 }

@@ -1,4 +1,5 @@
 use rayon::prelude::*;
+use shared::MtdIterator;
 
 pub struct Matrix {
     rows: usize,
@@ -51,11 +52,7 @@ fn main() {
     let x = Matrix::iota(size, size);
     let y = Matrix::iota(size, size);
 
-    for _ in 0..iter {
-        let mtd_start = shared::region_start();
-
+    for _ in MtdIterator::new(0..iter) {
         let _ = x.mul(y.transpose());
-
-        shared::region_stop(mtd_start);
     }
 }

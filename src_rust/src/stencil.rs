@@ -1,4 +1,5 @@
 use rayon::prelude::*;
+use shared::MtdIterator;
 
 pub struct Matrix {
     rows: usize,
@@ -46,11 +47,7 @@ fn main() {
 
     let mut arr = Matrix::iota(size, size);
 
-    for _ in 0..iter {
-        let mtd_start = shared::region_start();
-
+    for _ in MtdIterator::new(0..iter) {
         arr = arr.stencil();
-
-        shared::region_stop(mtd_start);
     }
 }
