@@ -1,8 +1,7 @@
 ## Building the container and removing outdated dangling versions
 
 ```
-docker build --no-cache -t mtdynamic .
-docker image prune
+docker build -t mtdynamic .
 ```
 
 ## Running the container mounted to the local filesystem
