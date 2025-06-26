@@ -1,4 +1,4 @@
-## Building the container and removing outdated dangling versions
+## Building the container
 
 ```
 docker build -t mtdynamic .
