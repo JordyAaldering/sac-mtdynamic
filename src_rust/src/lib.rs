@@ -14,17 +14,13 @@ static STREAM: LazyLock<Mutex<UnixStream>> = LazyLock::new(|| {
 /// First send a signal that we are at the start of a parallel region.
 /// We don't actually care about the thread-count that we receive back.
 pub fn region_start() -> (Instant, Rapl) {
-    let [i0, i1, i2, i3] = 0i32.to_ne_bytes();
-    let [t0, t1, t2, t3] = 1i32.to_ne_bytes();
-    let msg = [i0, i1, i2, i3, t0, t1, t2, t3];
+    let mut stream = STREAM.lock().unwrap();
 
-    {
-        let mut stream = STREAM.lock().unwrap();
-        stream.write_all(&msg).unwrap();
+    let msg = [0u8; 8];
+    stream.write_all(&msg).unwrap();
 
-        let mut buf = [0u8; 4];
-        stream.read_exact(&mut buf).unwrap();
-    }
+    let mut buf = [0u8; 4];
+    stream.read_exact(&mut buf).unwrap();
 
     let rapl = Rapl::now(false).unwrap();
     let now = Instant::now();

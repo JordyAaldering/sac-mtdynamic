@@ -28,7 +28,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 # Install SaC compiler
 RUN git clone --recursive --single-branch https://gitlab.sac-home.org/sac-group/sac2c.git \
     && cd sac2c && mkdir build && cd build \
-    && cmake -DCMAKE_BUILD_TYPE=RELEASE -DCUDA=OFF -DDISTMEM=OFF -DDISTMEM_GASNET=OFF .. \
+    && cmake -DCMAKE_BUILD_TYPE=RELEASE -DBUILDGENERIC=ON -DCUDA=OFF -DDISTMEM=OFF -DDISTMEM_GASNET=OFF .. \
     && make -j4 \
     && cp sac2c_p /usr/local/bin/sac2c \
     && sac2c -V
@@ -36,12 +36,13 @@ RUN git clone --recursive --single-branch https://gitlab.sac-home.org/sac-group/
 # Install SaC standard library
 RUN git clone --recursive --single-branch https://github.com/SacBase/Stdlib.git \
     && cd Stdlib && mkdir build && cd build \
-    && cmake -DBUILD_EXT=OFF -DFULLTYPES=OFF -DTARGETS="seq;mt_pth" .. \
+    && cmake -DBUILD_EXT=OFF -DBUILDGENERIC=ON -DFULLTYPES=OFF -DTARGETS="seq;mt_pth" .. \
     && make -j4
 
 # Install SaC energy measuring
 RUN git clone --single-branch --recursive https://github.com/SacBase/sac-energy.git \
-    && cd sac-energy \
+    && cd sac-energy && mkdir build && cd build \
+    && cmake -DBUILDGENERIC=ON -DTARGETS="seq;mt_pth" .. \
     && make
 
 # Install dynamic adaptation controller
