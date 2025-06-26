@@ -15,8 +15,12 @@ name = "matmul-transpose"
 path = "src/matmul_transpose.rs"
 
 [[bin]]
-name = "n-body"
+name = "nbody"
 path = "src/nbody.rs"
+
+[[bin]]
+name = "stencil"
+path = "src/stencil.rs"
 
 [dependencies]
 rapl-energy = { git = "https://github.com/JordyAaldering/rapl-energy.git" }
