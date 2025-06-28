@@ -10,7 +10,6 @@ fi
 iter=$1
 size=$2
 
-make clean
 make bin/matmul_mtd || exit 1
 
 ./start_server/genetic.sh &

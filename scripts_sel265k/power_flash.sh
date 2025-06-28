@@ -12,7 +12,6 @@ iter=$1
 d=$2
 n=$3
 
-make clean
 make bin/flash_seq || exit 1
 make bin/flash_mt || exit 1
 

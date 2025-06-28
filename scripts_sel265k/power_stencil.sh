@@ -10,7 +10,6 @@ fi
 iter=$1
 size=$2
 
-make clean
 make bin/stencil_mt || exit 1
 
 mkdir -p results_sel265k
