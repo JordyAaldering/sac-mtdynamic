@@ -1,7 +1,5 @@
 module Bench;
 
-use StdIO: { printf };
-
 export all;
 
 noinline
@@ -18,9 +16,8 @@ void stop(long sec_from, long nsec_from, longlong[.] rapl)
     sec_to, nsec_to = MTClock::gettime();
     energy_uj = Rapl::raplStop(rapl);
 
-    printf("%d %llu %f %f\n",
-           Rapl::numThreads(),
-           Rapl::constraint_0_power_limit_uw(),
-           MTClock::timediff(sec_from, nsec_from, sec_to, nsec_to),
-           Rapl::tod(energy_uj));
+    TermFile::printf("%d ", Rapl::numThreads());
+    TermFile::printf("%lld ", Rapl::constraint_0_power_limit_uw());
+    TermFile::printf("%f ", MTClock::timediff(sec_from, nsec_from, sec_to, nsec_to));
+    TermFile::printf("%f\n", Rapl::tod(energy_uj));
 }
