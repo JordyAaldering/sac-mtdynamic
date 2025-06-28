@@ -30,5 +30,5 @@ ADD "https://api.github.com/repos/SacBase/sac-energy/commits?per_page=1" sac-ene
 # Install SaC energy measuring
 RUN git clone --single-branch --recursive https://github.com/SacBase/sac-energy.git \
     && cd sac-energy && mkdir build && cd build \
-    && cmake -DBUILDGENERIC=ON -DTARGETS="seq;mt_pth" .. \
+    && cmake -DTARGETS="seq;mt_pth" .. \
     && make

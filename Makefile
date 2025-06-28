@@ -1,4 +1,4 @@
-SAC = sac2c
+SAC ?= sac2c
 SAC_FLAGS = -Xc -Ofast
 MT_FLAGS = -t mt_pth
 
