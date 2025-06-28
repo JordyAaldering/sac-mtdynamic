@@ -10,8 +10,7 @@ fi
 iter=$1
 size=$2
 
-make bin/nbody_seq || exit 1
-make bin/nbody_mt  || exit 1
+make bin/nbody_mt || exit 1
 
 mkdir -p results_sel265k
 
@@ -20,8 +19,8 @@ bench()
     echo $2 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $2 > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
-    numactl -C 0-$(($1-1)) $1 $2 $iter $size \
-        | awk -v size=$size -v threads=$2 -v powercap=$3 '{
+    numactl -C 0-$(($1-1)) ./bin/nbody_mt -mt $1 $iter $size \
+        | awk -v size=$size -v threads=$1 -v powercap=$2 '{
             for (i = 3; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
@@ -36,30 +35,8 @@ bench()
         }' >> "results_sel265k/nbody.csv"
 }
 
-# Single-threaded
-for w in 15000000 25000000 35000000 45000000 55000000 65000000 75000000 100000000 125000000
-do
-    bench "./bin/nbody_seq" 1 $w
-end
-
-# Use only performance cores
-bench "./bin/nbody_mt -mt " 8  15000000
-bench "./bin/nbody_mt -mt " 8  25000000
-bench "./bin/nbody_mt -mt " 8  35000000
-bench "./bin/nbody_mt -mt " 8  45000000
-bench "./bin/nbody_mt -mt " 8  55000000
-bench "./bin/nbody_mt -mt " 8  65000000
-bench "./bin/nbody_mt -mt " 8  75000000
-bench "./bin/nbody_mt -mt " 8 100000000
-bench "./bin/nbody_mt -mt " 8 125000000
-
-# Use both performance and efficiency cores
-bench "./bin/nbody_mt -mt " 20  15000000
-bench "./bin/nbody_mt -mt " 20  25000000
-bench "./bin/nbody_mt -mt " 20  35000000
-bench "./bin/nbody_mt -mt " 20  45000000
-bench "./bin/nbody_mt -mt " 20  55000000
-bench "./bin/nbody_mt -mt " 20  65000000
-bench "./bin/nbody_mt -mt " 20  75000000
-bench "./bin/nbody_mt -mt " 20 100000000
-bench "./bin/nbody_mt -mt " 20 125000000
+for t in 1 8 20; do
+    for w in 10000000 15000000 25000000 35000000 45000000 55000000 65000000 75000000 100000000 125000000; do
+        bench $t $w
+    done
+done
