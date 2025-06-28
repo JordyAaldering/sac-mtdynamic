@@ -3,4 +3,4 @@ mtdynamic --once \
           genetic --score energy \
                   --survival-rate 0.25 \
                   --mutation-rate 0.10 \
-                  --immigration-rate 0.05
+                  --immigration-rate 0
