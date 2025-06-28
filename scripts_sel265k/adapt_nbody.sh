@@ -13,13 +13,6 @@ size=$2
 make clean
 make bin/nbody_mtd || exit 1
 
-../mtdynamic/target/release/server \
-    --once \
-    --letterbox-size 20 \
-    genetic \
-        --score energy \
-        --survival-rate 0.75 \
-        --mutation-rate 0.25 \
-        --immigration-rate 0.0 &
+./start_server/genetic.sh &
 sleep 1 # Wait for the server to be running
 numactl -C 0-7 ./bin/nbody_mtd -mt 8 $iter $size
