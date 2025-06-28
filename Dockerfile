@@ -23,7 +23,7 @@ ADD "https://api.github.com/repos/JordyAaldering/mtdynamic/commits?per_page=1" m
 # Install dynamic adaptation controller
 RUN git clone --single-branch https://github.com/JordyAaldering/mtdynamic.git \
     && cd mtdynamic \
-    && make install
+    && LOCAL="/usr/local" make install
 
 # Check for changes on remote
 ADD "https://api.github.com/repos/SacBase/sac-energy/commits?per_page=1" sac-energy.json
