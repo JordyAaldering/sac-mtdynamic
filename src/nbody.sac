@@ -1,8 +1,6 @@
 #define OVERLOADED +,-,*
 use Array: all except { OVERLOADED };
 import Array: { OVERLOADED };
-use Vec3d: all except { OVERLOADED };
-import Vec3d: { OVERLOADED };
 use CommandLine: all;
 use StdIO: all;
 
