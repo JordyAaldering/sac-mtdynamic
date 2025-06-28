@@ -32,7 +32,7 @@ bench()
 }
 
 for threads in 1 8 20; do
-  for size in 10000 25000 50000; do
+  for size in 10000 25000; do
     for power in 10000000 15000000 25000000 35000000 45000000 55000000 65000000 75000000 100000000 125000000; do
       bench $threads $size $power
     done

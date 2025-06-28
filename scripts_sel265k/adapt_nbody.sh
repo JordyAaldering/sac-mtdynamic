@@ -13,5 +13,6 @@ size=$2
 make bin/nbody_mtd || exit 1
 
 ./start_server/genetic.sh &
-sleep 1 # Wait for the server to be running
+stress --cpu 20 --timeout 10
+# sleep 1 # Wait for the server to be running
 numactl -C 0-7 ./bin/nbody_mtd -mt 8 $iter $size
