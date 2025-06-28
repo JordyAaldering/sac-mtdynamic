@@ -11,15 +11,6 @@ bin/%_mt: src/%.sac host/mt-pth/libBenchMod.so
 bin/%_mtd: src/%.sac host/mt-pth/libBenchMod.so
 	$(SAC) ${MT_FLAGS} -mt_dynamic $(SAC_FLAGS) $< -o $@
 
-bin/nbody_seq: src/nbody.sac host/seq/libBenchMod.so host/seq/libVec3dMod.so
-	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
-
-bin/nbody_mt: src/nbody.sac host/mt-pth/libBenchMod.so host/mt-pth/libVec3dMod.so
-	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
-
-bin/nbody_mtd: src/nbody.sac host/mt-pth/libBenchMod.so host/mt-pth/libVec3dMod.so
-	$(SAC) ${MT_FLAGS} -mt_dynamic $(SAC_FLAGS) $< -o $@
-
 host/seq/lib%Mod.so: src/%.sac
 	$(SAC) $(SAC_FLAGS) $<
 
