@@ -1,8 +1,14 @@
 use std::hint::black_box;
 use std::ops::{Add, Sub, Mul, AddAssign, SubAssign};
-use std::default::Default;
 
 use shared::MtdIterator;
+
+#[derive(Clone, Debug)]
+struct Body {
+    position: Vec3D,
+    velocity: Vec3D,
+    mass: f64,
+}
 
 #[derive(Clone, Debug)]
 struct Vec3D(f64, f64, f64);
@@ -17,12 +23,6 @@ impl Vec3D {
     fn magnitude(&self, dt: f64) -> f64 {
         let sum = self.sum_squares();
         dt / (sum * sum.sqrt())
-    }
-}
-
-impl Default for Vec3D {
-    fn default() -> Vec3D {
-        Vec3D(0.0, 0.0, 0.0)
     }
 }
 
@@ -75,23 +75,16 @@ impl SubAssign for Vec3D {
     }
 }
 
-#[derive(Clone, Debug)]
-struct Body {
-    position: Vec3D,
-    velocity: Vec3D,
-    mass: f64,
-}
-
 /// Steps the simulation forward by one time-step.
 fn advance(bodies: &mut Vec<Body>, dt: f64) {
     let interactions = bodies.len() * (bodies.len() - 1) / 2;
-    let mut d_positions: Vec<Vec3D> = vec![Vec3D::default(); interactions];
+    let mut d_positions = vec![Vec3D(0.0, 0.0, 0.0); interactions];
     let mut magnitudes = vec![0.0; interactions];
 
     // Vectors between each pair of bodies.
     let mut k = 0;
     for (i, body1) in bodies.iter().enumerate() {
-        for body2 in &bodies[i + 1 ..] {
+        for body2 in &bodies[i + 1..] {
             d_positions[k] = &body1.position - &body2.position;
             k += 1;
         }
@@ -104,11 +97,11 @@ fn advance(bodies: &mut Vec<Body>, dt: f64) {
 
     // Apply every other body's gravitation to each body's velocity.
     let mut k = 0;
-    for i in 0 .. bodies.len() - 1 {
+    for i in 0..bodies.len() - 1 {
         let (body1, rest) = bodies[i..].split_first_mut().unwrap();
         for body2 in rest {
-            let d_pos       = &d_positions[k];
-            let mag         = magnitudes[k];
+            let d_pos = &d_positions[k];
+            let mag = magnitudes[k];
             body1.velocity -= d_pos * (body2.mass * mag);
             body2.velocity += d_pos * (body1.mass * mag);
             k += 1;
