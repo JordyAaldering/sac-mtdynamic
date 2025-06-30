@@ -17,9 +17,11 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl -C 0-$(($threads-1)) ./bin/nbody_mt -mt $threads 1 $size > /dev/null
+    #numactl -C 0-$(($threads-1))
+    ./bin/nbody_mt -mt $threads 1 $size > /dev/null
 
-    numactl -C 0-$(($threads-1)) ./bin/nbody_mt -mt $threads $ITER $size \
+    #numactl -C 0-$(($threads-1))
+    ./bin/nbody_mt -mt $threads $ITER $size \
         | awk -v size=$size -v threads=$threads -v powercap=$power -v bg=$bg '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
@@ -53,4 +55,4 @@ for size in 10000 25000; do
   done
 done
 
-pstree $pid_stress -p -a -l | cut -d, -f2 | cut -d' ' -f1 | xargs kill -9
+kill -9 "$pid_stress"
