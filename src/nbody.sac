@@ -78,17 +78,25 @@ struct Vec3d acc(struct Body b, struct Body b2)
 }
 
 noinline
-struct Body[n] timeStep(struct Body[n] bs, double dt)
+double[n] accs(struct Body[n] bs)
 {
     MTClock::touch();
 
-    acc = with {
-            ([0] <= [i] < [n])
-            #pragma gpukernel GridBlock(1, SplitLast(64, CompressGrid([1], ShiftLB(Gen))))
+    return with {
+        ([0] <= [i] < [n])
+        #pragma gpukernel GridBlock(1, SplitLast(64, CompressGrid([1], ShiftLB(Gen))))
             : with {
                 ([0] <= [j] < [n]): acc(_sel_VxA_([i], bs), _sel_VxA_([j], bs));
             }: fold(+, Vec3d{});
-        }: genarray([n], Vec3d{});
+    }: genarray([n], Vec3d{});
+}
+
+noinline
+struct Body[n] timeStep(struct Body[n] bs, double dt)
+{
+    sec, nsec, rapl = Bench::start();
+    acc = accs(bs);
+    Bench::stop(sec, nsec, rapl);
 
     bs.vel += acc * dt;
     bs.pos += bs.vel * dt;
@@ -106,9 +114,7 @@ int main()
              | [i] < [size] };
 
     for (i = 0; i < iter; i += 1) {
-        sec, nsec, rapl = Bench::start();
         bodies = timeStep(bodies, 0.01);
-        Bench::stop(sec, nsec, rapl);
     }
 
     return toi(_sel_VxA_([0], bodies).pos.x);
