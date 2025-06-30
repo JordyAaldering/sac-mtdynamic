@@ -13,7 +13,7 @@ static COUNTER: AtomicI32 = AtomicI32::new(0);
 
 pub struct MtdIterator<I: Iterator> {
     inner: I,
-    stream: UnixStream,
+    stream: Option<UnixStream>,
     region_uid: i32,
     region_start: Option<(Instant, Rapl)>,
 }
@@ -21,9 +21,15 @@ pub struct MtdIterator<I: Iterator> {
 impl<I: Iterator> MtdIterator<I> {
     pub fn new(inner: I) -> Self {
         let counter = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+
+        let stream = UnixStream::connect("/tmp/mtd_letterbox").ok();
+        if stream.is_none() {
+            eprintln!("WARN: no resource controller is running: using a fixed power limit")
+        }
+
         Self {
             inner,
-            stream: UnixStream::connect("/tmp/mtd_letterbox").unwrap(),
+            stream,
             region_uid: counter,
             region_start: None,
         }
@@ -32,13 +38,15 @@ impl<I: Iterator> MtdIterator<I> {
     /// First send a signal that we are at the start of a parallel region.
     /// We don't actually care about the thread-count that we receive back.
     fn region_start(&mut self) -> (Instant, Rapl) {
-        self.stream.write_all(&Request {
-            region_uid: self.region_uid,
-            problem_size: 0,
-        }.to_bytes()).unwrap();
+        if let Some(stream) = &mut self.stream {
+            stream.write_all(&Request {
+                region_uid: self.region_uid,
+                problem_size: 0,
+            }.to_bytes()).unwrap();
 
-        let mut buf = [0u8; 4];
-        self.stream.read_exact(&mut buf).unwrap();
+            let mut buf = [0u8; 4];
+            stream.read_exact(&mut buf).unwrap();
+        }
 
         let rapl = Rapl::now(false).unwrap();
         let now = Instant::now();
@@ -53,12 +61,14 @@ impl<I: Iterator> MtdIterator<I> {
         let energy = energy.values().sum();
         let powercap = get_powercap();
 
-        self.stream.write_all(&Sample {
-            region_uid: self.region_uid,
-            runtime,
-            usertime: 0.0,
-            energy,
-        }.to_bytes()).unwrap();
+        if let Some(stream) = &mut self.stream {
+            stream.write_all(&Sample {
+                region_uid: self.region_uid,
+                runtime,
+                usertime: 0.0,
+                energy,
+            }.to_bytes()).unwrap();
+        }
 
         println!("{} {:.9} {:.9}", powercap, runtime, energy);
     }
@@ -79,9 +89,9 @@ impl<I: Iterator> Iterator for MtdIterator<I> {
             }
 
             self.region_start = Some(self.region_start());
-        } else {
+        } else if let Some(stream) = &mut self.stream {
             // Last element; close connection
-            self.stream.shutdown(std::net::Shutdown::Both).unwrap();
+            stream.shutdown(std::net::Shutdown::Both).unwrap();
         }
 
         item

@@ -11,8 +11,8 @@ name = "matmul-naive"
 path = "src/matmul_naive.rs"
 
 [[bin]]
-name = "matmul-transpose"
-path = "src/matmul_transpose.rs"
+name = "matmul-transp"
+path = "src/matmul_transp.rs"
 
 [[bin]]
 name = "nbody"
