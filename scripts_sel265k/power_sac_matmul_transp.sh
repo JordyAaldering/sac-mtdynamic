@@ -2,7 +2,7 @@
 
 ITER=20
 
-make bin/matmul_mt || exit 1
+make bin/matmul_transp_mt || exit 1
 
 mkdir -p results_sel265k
 
@@ -15,7 +15,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
-    numactl -C 0-$(($threads-1)) ./bin/matmul_mt -mt $threads $ITER $size \
+    numactl -C 0-$(($threads-1)) ./bin/matmul_transp_mt -mt $threads $ITER $size \
         | awk -v size=$size -v threads=$threads -v powercap=$power '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;

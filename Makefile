@@ -2,17 +2,11 @@ SAC ?= sac2c
 SAC_FLAGS = -maxwlur 9 -Xc -Ofast
 MT_FLAGS = -t mt_pth
 
-bin/%_seq: src/%.sac host/seq/libBenchMod.so
-	$(SAC) $(SAC_FLAGS) $< -o $@
-
 bin/%_mt: src/%.sac host/mt-pth/libBenchMod.so
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
 
 bin/%_mtd: src/%.sac host/mt-pth/libBenchMod.so
-	$(SAC) ${MT_FLAGS} -mt_dynamic $(SAC_FLAGS) $< -o $@
-
-host/seq/lib%Mod.so: src/%.sac
-	$(SAC) $(SAC_FLAGS) $<
+	$(SAC) -mt_dynamic ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
 
 host/mt-pth/lib%Mod.so: src/%.sac
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $<
