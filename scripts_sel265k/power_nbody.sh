@@ -34,8 +34,8 @@ bench()
 for threads in 1 8 20; do
   stress --cpu 20 --timeout 60
   for size in 10000 25000; do
-    for power_rate in 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0; do
-      bench $threads $size $(($power_rate*125000000))
+    for power_pct in 10 20 30 40 50 60 70 80 90 100; do
+      bench $threads $size $((125000000*100/$power_pct))
     done
   done
 done
