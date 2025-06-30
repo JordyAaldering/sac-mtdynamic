@@ -47,7 +47,7 @@ bench()
 stress-ng -c 4 --taskset 0,1,2,3 &
 pid_stress=$!
 
-for size in 5000 10000; do
+for size in 10000 25000; do
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4
   done
