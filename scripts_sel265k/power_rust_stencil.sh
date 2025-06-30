@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=30
+ITER=20
 
 (
 cd src_rust

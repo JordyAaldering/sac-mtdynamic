@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=30
+ITER=20
 
 make bin/matmul_transp_mt || exit 1
 
