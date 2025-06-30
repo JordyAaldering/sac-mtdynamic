@@ -35,18 +35,18 @@ bench()
         }' >> "results_sel265k/power_sac_nbody.csv"
 }
 
-#for threads in 1 8; do
-#  for size in 10000 25000; do
-#    for power in {12500000..125000000..12500000}; do
-#      bench $threads $size $power 0
-#    done
-#  done
-#done
+for threads in 1 8; do
+  for size in 5000 25000; do
+    for power in {12500000..125000000..12500000}; do
+      bench $threads $size $power 0
+    done
+  done
+done
 
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
 
-for size in 10000 25000; do
+for size in 5000 25000; do
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4
   done
