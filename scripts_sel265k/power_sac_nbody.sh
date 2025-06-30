@@ -46,13 +46,12 @@ bench()
 #done
 
 # With background load
-stress-ng -c 4 --taskset 0,1,2,3 &
-pid_stress=$!
+stress-ng -c 20 --taskset 0-20 &
 
 for size in 10000 25000; do
   for power in {12500000..125000000..12500000}; do
-    bench 8 $size $power 4
+    bench 20 $size $power 4
   done
 done
 
-kill -9 "$pid_stress"
+killall stress-ng

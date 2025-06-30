@@ -9,6 +9,7 @@ RUN apt update \
         curl \
         git \
         stress-ng \
+        psmisc \
     && apt clean \
     && apt autoclean \
     && apt --purge autoremove
