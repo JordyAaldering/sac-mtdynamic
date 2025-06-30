@@ -20,14 +20,14 @@ bench()
 
     numactl -C 0-$(($threads-1)) ./src_rust/target/debug/stencil $ITER $size $threads \
         | awk -v size=$size -v threads=$threads -v powercap=$power '{
-            for (i = 3; i <= NF; i++) {
+            for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
                 a[i] = b[i];
             }
         } END {
             printf "nbody %d %d %d", size, threads, powercap;
-            for (i = 3; i <= NF; i++) {
+            for (i = 2; i <= NF; i++) {
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
             print "";
@@ -37,7 +37,7 @@ bench()
 for threads in 1 8; do
   stress --cpu 20 --timeout 60
   for size in 10000 25000; do
-    for power in {12500000..125000000..12500000}; do
+    for power in {12500000..125000000..6250000}; do
       bench $threads $size $power
     done
   done
