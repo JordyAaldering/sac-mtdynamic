@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ITER=20
-HEADDIM=64
+HEAD_DIM=64
 
 make bin/flash_mt || exit 1
 
@@ -17,7 +17,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     numactl -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads $ITER $HEAD_DIM $sequence_length \
-        | awk -v size=$(($HEAD_DIM * $sequence_length)) -v threads=$threads -v powercap=$power '{
+        | awk -v size=$sequence_length -v threads=$threads -v powercap=$power '{
             for (i = 3; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
