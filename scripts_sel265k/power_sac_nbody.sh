@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=20
+ITER=30
 
 make bin/nbody_mt || exit 1
 

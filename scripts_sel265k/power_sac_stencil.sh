@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=20
+ITER=30
 
 make bin/stencil_mt || exit 1
 
