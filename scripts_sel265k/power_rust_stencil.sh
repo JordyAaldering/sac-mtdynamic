@@ -3,7 +3,7 @@
 ITER=20
 
 (
-cd src_rust
+cd rust
 cargo build --release
 )
 
@@ -19,9 +19,9 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl -C 0-$(($threads-1)) ./src_rust/target/release/stencil 1 $size $threads > /dev/null
+    numactl -C 0-$(($threads-1)) ./rust/target/release/stencil 1 $size $threads > /dev/null
 
-    numactl -C 0-$(($threads-1)) ./src_rust/target/release/stencil $ITER $size $threads \
+    numactl -C 0-$(($threads-1)) ./rust/target/release/stencil $ITER $size $threads \
         | awk -v size=$size -v threads=$threads -v powercap=$power '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;

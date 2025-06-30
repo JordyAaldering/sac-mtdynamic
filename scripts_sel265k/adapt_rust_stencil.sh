@@ -11,13 +11,13 @@ iter=$1
 size=$2
 
 (
-cd src_rust
+cd rust
 cargo build --release
 )
 
 # Warmup
-numactl -C 0-7 ./src_rust/target/release/stencil 10 $size 8 > /dev/null
+numactl -C 0-7 ./rust/target/release/stencil 10 $size 8 > /dev/null
 
 ./start_server/genetic.sh &
 sleep 1 # Wait for server to be ready
-numactl -C 0-7 ./src_rust/target/release/stencil $iter $size 8
+numactl -C 0-7 ./rust/target/release/stencil $iter $size 8
