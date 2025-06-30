@@ -44,11 +44,11 @@ bench()
 #done
 
 # With background load
-stress-ng -c 20 --taskset 0-19 &
+stress-ng -c 8 --taskset 0-7 &
 
 for size in 10000 25000; do
   for power in {12500000..125000000..12500000}; do
-    bench 8 $size $power 20
+    bench 8 $size $power 8
   done
 done
 
