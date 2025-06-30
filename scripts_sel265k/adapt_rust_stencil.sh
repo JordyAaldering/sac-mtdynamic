@@ -15,6 +15,9 @@ cd src_rust
 cargo build --release
 )
 
+# Warmup
+numactl -C 0-7 ./src_rust/target/release/stencil 10 $size 8 > /dev/null
+
 ./start_server/genetic.sh &
-stress --cpu 20 --timeout 60
+sleep 1 # Wait for server to be ready
 numactl -C 0-7 ./src_rust/target/release/stencil $iter $size 8

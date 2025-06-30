@@ -8,7 +8,6 @@ RUN apt update \
         cmake \
         curl \
         git \
-        stress \
     && apt clean \
     && apt autoclean \
     && apt --purge autoremove

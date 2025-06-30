@@ -15,6 +15,9 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
+    # Warmup
+    numactl -C 0-$(($threads-1)) ./bin/matmul_naive_mt -mt $threads 1 $size > /dev/null
+
     numactl -C 0-$(($threads-1)) ./bin/matmul_naive_mt -mt $threads $ITER $size \
         | awk -v size=$size -v threads=$threads -v powercap=$power '{
             for (i = 2; i <= NF; i++) {
@@ -32,7 +35,6 @@ bench()
 }
 
 for threads in 1 8; do
-  stress --cpu 20 --timeout 60
   for size in 500 1000 1500; do
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power
