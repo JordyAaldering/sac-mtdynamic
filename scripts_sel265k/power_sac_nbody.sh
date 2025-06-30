@@ -53,4 +53,4 @@ for size in 10000 25000; do
   done
 done
 
-kill -9 "$pid_stress"
+pstree $pid_stress -p -a -l | cut -d, -f2 | cut -d' ' -f1 | xargs kill -9
