@@ -21,15 +21,9 @@ pub struct MtdIterator<I: Iterator> {
 impl<I: Iterator> MtdIterator<I> {
     pub fn new(inner: I) -> Self {
         let counter = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-
-        let stream = UnixStream::connect("/tmp/mtd_letterbox").ok();
-        if stream.is_none() {
-            eprintln!("WARN: no resource controller is running: using a fixed power limit")
-        }
-
         Self {
             inner,
-            stream,
+            stream: UnixStream::connect("/tmp/mtd_letterbox").ok(),
             region_uid: counter,
             region_start: None,
         }
