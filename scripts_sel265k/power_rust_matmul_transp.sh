@@ -26,7 +26,7 @@ bench()
                 a[i] = b[i];
             }
         } END {
-            printf "matmul %d %d %d", size, threads, powercap;
+            printf "%d %d %d", size, threads, powercap;
             for (i = 2; i <= NF; i++) {
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
@@ -36,7 +36,7 @@ bench()
 
 for threads in 1 8; do
   #stress --cpu 20 --timeout 60
-  for size in 10000 25000; do
+  for size in 500 1500; do
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power
     done

@@ -2,7 +2,7 @@
 
 ITER=20
 
-make bin/matmul_naive_mt || exit 1
+make bin/stencil_mt || exit 1
 
 mkdir -p results_sel265k
 
@@ -15,25 +15,25 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
-    numactl -C 0-$(($threads-1)) ./bin/matmul_naive_mt -mt $threads $ITER $size \
+    numactl -C 0-$(($threads-1)) ./bin/stencil_mt -mt $threads $ITER $size \
         | awk -v size=$size -v threads=$threads -v powercap=$power '{
-            for (i = 3; i <= NF; i++) {
+            for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
                 a[i] = b[i];
             }
         } END {
-            printf "matmul_naive %d %d %d", size, threads, powercap;
-            for (i = 3; i <= NF; i++) {
+            printf "%d %d %d", size, threads, powercap;
+            for (i = 2; i <= NF; i++) {
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
             print "";
-        }' >> "results_sel265k/power_matmul_naive.csv"
+        }' >> "results_sel265k/power_sac_stencil.csv"
 }
 
 for threads in 1 8; do
   stress --cpu 20 --timeout 60
-  for size in 1000 2000; do
+  for size in 10000 25000; do
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power
     done

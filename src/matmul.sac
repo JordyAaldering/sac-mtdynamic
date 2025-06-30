@@ -25,11 +25,10 @@ int main()
 
     a = tod(reshape([size,size], iota(size * size)));
     b = tod(reshape([size,size], iota(size * size)));
+    // We only want to measure/control the multiplication part, so transpose beforehand
+    bT = transpose(b);
 
     for (i = 0; i < iter; i += 1) {
-        sec, nsec, rapl = Bench::start();
-        bT = transpose(b);
-        Bench::stop(sec, nsec, rapl);
 
         sec, nsec, rapl = Bench::start();
         a = matmulT(a, bT);

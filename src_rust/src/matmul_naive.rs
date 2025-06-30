@@ -16,7 +16,7 @@ impl Matrix {
     }
 
     /// { [i,j] -> sum({ [p] -> a[i,p] * b[p,j] }) }
-    pub fn mul(&self, other: &Matrix) -> Matrix {
+    pub fn mul(self, other: &Self) -> Self {
         let mut data = vec![vec![0.0; self.rows]; other.cols];
 
         data.par_iter_mut().enumerate().for_each(|(x, row)| {
@@ -39,10 +39,10 @@ fn main() {
 
     rayon::ThreadPoolBuilder::new().num_threads(num_threads).build_global().unwrap();
 
-    let x = Matrix::iota(size, size);
+    let mut x = Matrix::iota(size, size);
     let y = Matrix::iota(size, size);
 
     for _ in MtdIterator::new(0..iter) {
-        let _ = x.mul(&y);
+        x = x.mul(&y);
     }
 }

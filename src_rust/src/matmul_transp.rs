@@ -26,7 +26,7 @@ impl Matrix {
     }
 
     /// { [i,j] -> sum(a[i] * bT[j]) | [i,j] < [m,n] }
-    pub fn mul(&self, other: Self) -> Self {
+    pub fn mul(self, other: &Self) -> Self {
         let mut data = vec![vec![0.0; self.rows]; other.rows];
 
         data.par_iter_mut().enumerate().for_each(|(x, row)| {
@@ -49,10 +49,12 @@ fn main() {
 
     rayon::ThreadPoolBuilder::new().num_threads(num_threads).build_global().unwrap();
 
-    let x = Matrix::iota(size, size);
+    let mut x = Matrix::iota(size, size);
     let y = Matrix::iota(size, size);
+    // We only want to measure/control the multiplication part, so transpose beforehand
+    let y_t = y.transpose();
 
     for _ in MtdIterator::new(0..iter) {
-        let _ = x.mul(y.transpose());
+        x = x.mul(&y_t);
     }
 }

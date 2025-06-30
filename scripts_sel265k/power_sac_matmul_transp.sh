@@ -1,42 +1,41 @@
 #!/bin/bash
 
 ITER=20
-HEAD_DIM=64
 
-make bin/flash_mt || exit 1
+make bin/matmul_mt || exit 1
 
 mkdir -p results_sel265k
 
 bench()
 {
     threads=$1
-    sequence_length=$2
+    size=$2
     power=$3
 
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
-    numactl -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads $ITER $HEAD_DIM $sequence_length \
-        | awk -v size=$sequence_length -v threads=$threads -v powercap=$power '{
-            for (i = 3; i <= NF; i++) {
+    numactl -C 0-$(($threads-1)) ./bin/matmul_mt -mt $threads $ITER $size \
+        | awk -v size=$size -v threads=$threads -v powercap=$power '{
+            for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
                 a[i] = b[i];
             }
         } END {
-            printf "flash %d %d %d", size, threads, powercap;
-            for (i = 3; i <= NF; i++) {
+            printf "%d %d %d", size, threads, powercap;
+            for (i = 2; i <= NF; i++) {
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
             print "";
-        }' >> "results_sel265k/power_flash.csv"
+        }' >> "results_sel265k/power_sac_matmul_transp.csv"
 }
 
 for threads in 1 8; do
   stress --cpu 20 --timeout 60
-  for sequence_length in 1024 2048; do
+  for size in 500 1500; do
     for power in {12500000..125000000..12500000}; do
-      bench $threads $sequence_length $power
+      bench $threads $size $power
     done
   done
 done

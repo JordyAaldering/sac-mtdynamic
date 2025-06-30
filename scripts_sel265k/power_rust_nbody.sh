@@ -26,7 +26,7 @@ bench()
                 a[i] = b[i];
             }
         } END {
-            printf "nbody %d %d %d", size, threads, powercap;
+            printf "%d %d %d", size, threads, powercap;
             for (i = 2; i <= NF; i++) {
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }

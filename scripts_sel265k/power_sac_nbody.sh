@@ -2,7 +2,7 @@
 
 ITER=20
 
-make bin/stencil_mt || exit 1
+make bin/nbody_mt || exit 1
 
 mkdir -p results_sel265k
 
@@ -15,20 +15,20 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
-    numactl -C 0-$(($threads-1)) ./bin/stencil_mt -mt $threads $ITER $size \
+    numactl -C 0-$(($threads-1)) ./bin/nbody_mt -mt $threads $ITER $size \
         | awk -v size=$size -v threads=$threads -v powercap=$power '{
-            for (i = 3; i <= NF; i++) {
+            for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
                 a[i] = b[i];
             }
         } END {
-            printf "stencil %d %d %d", size, threads, powercap;
-            for (i = 3; i <= NF; i++) {
+            printf "%d %d %d", size, threads, powercap;
+            for (i = 2; i <= NF; i++) {
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
             print "";
-        }' >> "results_sel265k/power_stencil.csv"
+        }' >> "results_sel265k/power_sac_nbody.csv"
 }
 
 for threads in 1 8; do
