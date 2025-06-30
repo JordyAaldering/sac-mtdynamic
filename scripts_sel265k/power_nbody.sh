@@ -31,7 +31,7 @@ bench()
         }' >> "results_sel265k/power_nbody.csv"
 }
 
-for threads in 1 8 20; do
+for threads in 1 8; do
   stress --cpu 20 --timeout 60
   for size in 10000 25000; do
     for power in {12500000..125000000..12500000}; do
