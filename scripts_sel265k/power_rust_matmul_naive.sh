@@ -42,6 +42,6 @@ for threads in 1 8; do
       bench $threads $size $power
       printf "."
     done
-    print ""
+    printf "\n"
   done
 done
