@@ -12,9 +12,9 @@ size=$2
 
 (
 cd src_rust
-cargo build
+cargo build --release
 )
 
 ./start_server/genetic.sh &
-sleep 1 # Wait for the server to be running
+stress --cpu 20 --timeout 60
 numactl -C 0-7 ./src_rust/target/debug/stencil $iter $size 8

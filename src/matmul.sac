@@ -3,7 +3,7 @@ use CommandLine: all;
 use StdIO: all;
 
 noinline
-int[n,k] transpose(int[k,n] b)
+double[n,k] transpose(double[k,n] b)
 {
     MTClock::touch();
 
@@ -11,7 +11,7 @@ int[n,k] transpose(int[k,n] b)
 }
 
 noinline
-int[m,n] matmulT(int[m,k] a, int[n,k] bT)
+double[m,n] matmulT(double[m,k] a, double[n,k] bT)
 {
     MTClock::touch();
 
@@ -23,8 +23,8 @@ int main()
     iter = String::toi(argv(argc() - 2));
     size = String::toi(argv(argc() - 1));
 
-    a = reshape([size,size], iota(size * size));
-    b = reshape([size,size], iota(size * size));
+    a = tod(reshape([size,size], iota(size * size)));
+    b = tod(reshape([size,size], iota(size * size)));
 
     for (i = 0; i < iter; i += 1) {
         sec, nsec, rapl = Bench::start();
@@ -32,9 +32,9 @@ int main()
         Bench::stop(sec, nsec, rapl);
 
         sec, nsec, rapl = Bench::start();
-        _res = matmulT(a, bT);
+        a = matmulT(a, bT);
         Bench::stop(sec, nsec, rapl);
     }
 
-    return a[0,0];
+    return toi(a[0,0]);
 }

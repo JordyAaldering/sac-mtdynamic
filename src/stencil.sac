@@ -19,9 +19,9 @@ int main()
     size = String::toi(argv(argc() - 1));
 
     arr = tod(reshape([size,size], iota(size * size)));
-    w = [ [0.05, 0.15, 0.05],
-          [0.15, 0.20, 0.15],
-          [0.05, 0.15, 0.05] ];
+    w = [ [1d/9d, 1d/9d, 1d/9d],
+          [1d/9d, 1d/9d, 1d/9d],
+          [1d/9d, 1d/9d, 1d/9d] ];
 
     for (i = 0; i < iter; i += 1) {
         sec, nsec, rapl = Bench::start();

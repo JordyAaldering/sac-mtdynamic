@@ -23,9 +23,9 @@ bench()
                 a[i] = b[i];
             }
         } END {
-            printf "nbody,%d,%d,%d", size, threads, powercap;
+            printf "nbody %d %d %d", size, threads, powercap;
             for (i = 3; i <= NF; i++) {
-                printf ",%f,%f", a[i], sqrt(q[i] / NR);
+                printf " %f %f", a[i], sqrt(q[i] / NR);
             }
             print "";
         }' >> "results_sel265k/power_nbody.csv"

@@ -13,5 +13,5 @@ size=$2
 make bin/matmul_mtd || exit 1
 
 ./start_server/genetic.sh &
-sleep 1 # Wait for the server to be running
+stress --cpu 20 --timeout 60
 numactl -C 0-7 ./bin/matmul_mtd -mt 8 $iter $size
