@@ -29,10 +29,11 @@ impl Matrix {
     pub fn mul(self, other: &Self) -> Self {
         let mut data = vec![vec![0.0; self.rows]; other.rows];
 
-        data.par_iter_mut().enumerate().for_each(|(x, row)| {
+        data.par_iter_mut().for_each(|row| {
             for y in 0..other.rows {
+                let other_row = &other.data[y];
                 for i in 0..self.cols {
-                    row[y] += self.data[x][i] * other.data[y][i];
+                    row[y] += row[i] * other_row[i];
                 }
             }
         });
