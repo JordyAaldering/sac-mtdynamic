@@ -34,7 +34,7 @@ bench()
 
 for threads in 1 8; do
   stress --cpu 20 --timeout 60
-  for sequence_length in 4096 8192; do
+  for sequence_length in 1024 2048; do
     for power in {12500000..125000000..6250000}; do
       bench $threads $sequence_length $power
     done
