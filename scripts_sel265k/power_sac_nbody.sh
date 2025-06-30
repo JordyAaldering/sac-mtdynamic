@@ -46,7 +46,7 @@ bench()
 #done
 
 # With background load
-stress-ng -c 20 --taskset 0-20 &
+stress-ng -c 20 --taskset 0-19 &
 
 for size in 10000 25000; do
   for power in {12500000..125000000..12500000}; do
