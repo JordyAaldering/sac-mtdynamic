@@ -78,7 +78,7 @@ struct Vec3d acc(struct Body b, struct Body b2)
 }
 
 noinline
-double[n] accs(struct Body[n] bs)
+struct Vec3d[n] accs(struct Body[n] bs)
 {
     MTClock::touch();
 
