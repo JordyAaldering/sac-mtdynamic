@@ -17,4 +17,4 @@ cargo build --release
 
 ./start_server/genetic.sh &
 stress --cpu 20 --timeout 60
-numactl -C 0-7 ./src_rust/target/debug/stencil $iter $size 8
+numactl -C 0-7 ./src_rust/target/release/stencil $iter $size 8

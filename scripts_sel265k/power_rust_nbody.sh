@@ -18,7 +18,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
-    numactl -C 0-$(($threads-1)) ./src_rust/target/debug/stencil $ITER $size $threads \
+    numactl -C 0-$(($threads-1)) ./src_rust/target/release/stencil $ITER $size $threads \
         | awk -v size=$size -v threads=$threads -v powercap=$power '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
@@ -31,11 +31,11 @@ bench()
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
             print "";
-        }' >> "results_sel265k/power_nbody.csv"
+        }' >> "results_sel265k/power_rust_nbody.csv"
 }
 
 for threads in 1 8; do
-  stress --cpu 20 --timeout 60
+  #stress --cpu 20 --timeout 60
   for size in 10000 25000; do
     for power in {12500000..125000000..6250000}; do
       bench $threads $size $power
