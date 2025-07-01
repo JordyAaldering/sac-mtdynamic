@@ -1,3 +1,5 @@
+use std::hint::black_box;
+
 use rayon::prelude::*;
 use shared::MtdIterator;
 
@@ -8,25 +10,25 @@ pub struct Matrix {
 }
 
 impl Matrix {
-    pub fn iota(rows: usize, cols: usize) -> Self {
+    pub fn iota(rows: usize, cols: usize) -> Matrix {
         let data = (0..cols).map(|y| {
             (0..rows).map(|x| (x + y * rows) as f64).collect()
         }).collect();
-        Self { rows, cols, data }
+        Matrix { rows, cols, data }
     }
 
     /// { [i,j] -> b[j,i] | [i,j] < [n,k] }
-    pub fn transpose(&self) -> Self {
+    pub fn transpose(self) -> Matrix {
         let data = (0..self.cols).map(|x| {
             (0..self.rows).map(|y| {
                 self.data[y][x]
             }).collect()
         }).collect();
-        Self { rows: self.cols, cols: self.rows, data }
+        Matrix { rows: self.cols, cols: self.rows, data }
     }
 
     /// { [i,j] -> sum(a[i] * bT[j]) | [i,j] < [m,n] }
-    pub fn mul(self, other: &Self) -> Self {
+    pub fn mul(&self, other: &Matrix) -> Matrix {
         let mut data = vec![vec![0.0; self.rows]; other.rows];
 
         data.par_iter_mut().for_each(|row| {
@@ -38,7 +40,7 @@ impl Matrix {
             }
         });
 
-        Self { rows: self.rows, cols: other.cols, data }
+        Matrix { rows: self.rows, cols: other.cols, data }
     }
 }
 
@@ -50,12 +52,11 @@ fn main() {
 
     rayon::ThreadPoolBuilder::new().num_threads(num_threads).build_global().unwrap();
 
-    let mut x = Matrix::iota(size, size);
-    let y = Matrix::iota(size, size);
+    let x = Matrix::iota(size, size);
     // We only want to measure/control the multiplication part, so transpose beforehand
-    let y_t = y.transpose();
+    let y_t = Matrix::iota(size, size).transpose();
 
     for _ in MtdIterator::new(0..iter) {
-        x = x.mul(&y_t);
+        black_box(x.mul(&y_t));
     }
 }

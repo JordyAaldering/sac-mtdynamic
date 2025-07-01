@@ -1,3 +1,5 @@
+use std::hint::black_box;
+
 use rayon::prelude::*;
 use shared::MtdIterator;
 
@@ -13,7 +15,7 @@ impl Matrix {
         Self { rows, cols, data }
     }
 
-    fn stencil(self) -> Matrix {
+    fn stencil(&self) -> Matrix {
         let rows = self.rows;
         let cols = self.cols;
 
@@ -45,9 +47,9 @@ fn main() {
 
     rayon::ThreadPoolBuilder::new().num_threads(num_threads).build_global().unwrap();
 
-    let mut arr = Matrix::iota(size, size);
+    let arr = Matrix::iota(size, size);
 
     for _ in MtdIterator::new(0..iter) {
-        arr = arr.stencil();
+        black_box(arr.stencil());
     }
 }
