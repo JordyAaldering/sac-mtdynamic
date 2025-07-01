@@ -1,35 +1,24 @@
+use std::f64;
 use std::hint::black_box;
 use std::ops::{Add, Sub, Mul, AddAssign, SubAssign};
 
+use rayon::prelude::*;
 use shared::MtdIterator;
 
 #[derive(Clone, Debug)]
 struct Body {
-    position: Vec3D,
-    velocity: Vec3D,
+    pos: Vec3d,
+    vel: Vec3d,
     mass: f64,
 }
 
-#[derive(Clone, Debug)]
-struct Vec3D(f64, f64, f64);
+#[derive(Copy, Clone, Debug)]
+struct Vec3d(f64, f64, f64);
 
-impl Vec3D {
-    fn sum_squares(&self) -> f64 {
-        self.0 * self.0
-            + self.1 * self.1
-            + self.2 * self.2
-    }
-
-    fn magnitude(&self, dt: f64) -> f64 {
-        let sum = self.sum_squares();
-        dt / (sum * sum.sqrt())
-    }
-}
-
-impl Add for &Vec3D {
-    type Output = Vec3D;
+impl Add for Vec3d {
+    type Output = Vec3d;
     fn add(self, rhs: Self) -> Self::Output {
-        Vec3D(
+        Vec3d(
             self.0 + rhs.0,
             self.1 + rhs.1,
             self.2 + rhs.2
@@ -37,10 +26,10 @@ impl Add for &Vec3D {
     }
 }
 
-impl Sub for &Vec3D {
-    type Output = Vec3D;
+impl Sub for Vec3d {
+    type Output = Vec3d;
     fn sub(self, rhs: Self) -> Self::Output {
-        Vec3D(
+        Vec3d(
             self.0 - rhs.0,
             self.1 - rhs.1,
             self.2 - rhs.2
@@ -48,10 +37,10 @@ impl Sub for &Vec3D {
     }
 }
 
-impl Mul<f64> for &Vec3D {
-    type Output = Vec3D;
+impl Mul<f64> for Vec3d {
+    type Output = Vec3d;
     fn mul(self, rhs: f64) -> Self::Output {
-        Vec3D(
+        Vec3d(
             self.0 * rhs,
             self.1 * rhs,
             self.2 * rhs
@@ -59,7 +48,7 @@ impl Mul<f64> for &Vec3D {
     }
 }
 
-impl AddAssign for Vec3D {
+impl AddAssign for Vec3d {
     fn add_assign(&mut self, rhs: Self) {
         self.0 += rhs.0;
         self.1 += rhs.1;
@@ -67,7 +56,7 @@ impl AddAssign for Vec3D {
     }
 }
 
-impl SubAssign for Vec3D {
+impl SubAssign for Vec3d {
     fn sub_assign(&mut self, rhs: Self) {
         self.0 -= rhs.0;
         self.1 -= rhs.1;
@@ -75,43 +64,35 @@ impl SubAssign for Vec3D {
     }
 }
 
-/// Steps the simulation forward by one time-step.
-fn advance(bodies: &mut Vec<Body>, dt: f64) {
-    let interactions = bodies.len() * (bodies.len() - 1) / 2;
-    let mut d_positions = vec![Vec3D(0.0, 0.0, 0.0); interactions];
-    let mut magnitudes = vec![0.0; interactions];
+fn pow3(x: f64) -> f64 {
+    x * x * x
+}
 
-    // Vectors between each pair of bodies.
-    let mut k = 0;
-    for (i, body1) in bodies.iter().enumerate() {
-        for body2 in &bodies[i + 1..] {
-            d_positions[k] = &body1.position - &body2.position;
-            k += 1;
-        }
-    }
+fn l2norm(v: Vec3d) -> f64 {
+    (v.0 * v.0 + v.1 * v.1 + v.2 * v.2).sqrt()
+}
 
-    // Magnitude between each pair of bodies.
-    for (mag, d_pos) in magnitudes.iter_mut().zip(d_positions.iter()) {
-        *mag = d_pos.magnitude(dt);
-    };
+fn acc(b: &Body, b2: &Body) -> Vec3d {
+    let dir = b2.pos - b.pos;
+    let norm = l2norm(dir);
+    dir * (b2.mass / pow3(f64::EPSILON + norm))
+}
 
-    // Apply every other body's gravitation to each body's velocity.
-    let mut k = 0;
-    for i in 0..bodies.len() - 1 {
-        let (body1, rest) = bodies[i..].split_first_mut().unwrap();
-        for body2 in rest {
-            let d_pos = &d_positions[k];
-            let mag = magnitudes[k];
-            body1.velocity -= d_pos * (body2.mass * mag);
-            body2.velocity += d_pos * (body1.mass * mag);
-            k += 1;
-        }
-    }
+fn time_step(bodies: &mut Vec<Body>, dt: f64) {
+    let acc = bodies.par_iter()
+        .map(|b| {
+            bodies.iter()
+                .filter(|&b2| !std::ptr::eq(b, b2))
+                .map(|b2| acc(b, b2))
+                .fold(Vec3d(0.0, 0.0, 0.0), |a, b| a + b)
+        }).collect::<Vec<_>>();
 
-    // Update positions
-    for body in bodies.iter_mut() {
-        body.position += &body.velocity * dt;
-    }
+    bodies.par_iter_mut()
+        .zip(acc)
+        .for_each(|(body, acc)| {
+            body.vel += acc * dt;
+            body.pos += body.vel * dt;
+        });
 }
 
 fn main() {
@@ -124,13 +105,13 @@ fn main() {
 
     let mut bodies = (0..size).map(|i| {
         Body {
-            position: Vec3D(i as f64, (i * 2) as f64, (i * 3) as f64),
-            velocity: Vec3D(0.0, 0.0, 0.0),
+            pos: Vec3d(i as f64, (i * 2) as f64, (i * 3) as f64),
+            vel: Vec3d(0.0, 0.0, 0.0),
             mass: 1.0,
         }
     }).collect();
 
     for _ in MtdIterator::new(0..iter) {
-        black_box(advance(&mut bodies, 0.01));
+        black_box(time_step(&mut bodies, 0.01));
     }
 }
