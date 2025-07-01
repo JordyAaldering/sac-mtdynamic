@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=20
+ITER=30
 HEAD_DIM=64
 
 make bin/flash_mt || exit 1
@@ -36,7 +36,7 @@ bench()
         }' >> "results_sel265k/power_sac_flash.csv"
 }
 
-for threads in 1 8; do
+for threads in 8; do
   for sequence_length in 2048 8192; do
     for power in {12500000..125000000..12500000}; do
       bench $threads $sequence_length $power 0

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=20
+ITER=30
 HEAD_DIM=64
 
 (
@@ -36,11 +36,11 @@ bench()
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
             print "";
-        }' >> "results_sel265k/power_rust_matmul_transp.csv"
+        }' >> "results_sel265k/power_rust_flash.csv"
 }
 
 for threads in 8; do
-  for size in 1024 2048; do
+  for size in 2048 8192; do
     printf "%d %d" $threads $size
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power 0
@@ -53,7 +53,7 @@ done
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
 
-for size in 1024 2048; do
+for size in 2048 8192; do
   printf "%d %d" $threads $size
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4
