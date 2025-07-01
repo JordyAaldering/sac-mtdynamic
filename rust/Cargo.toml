@@ -7,6 +7,10 @@ edition = "2024"
 name = "shared"
 
 [[bin]]
+name = "flash"
+path = "src/flash.rs"
+
+[[bin]]
 name = "matmul-naive"
 path = "src/matmul_naive.rs"
 
@@ -24,5 +28,6 @@ path = "src/stencil.rs"
 
 [dependencies]
 controller = { git = "https://github.com/JordyAaldering/mtdynamic.git" }
+ndarray = "0.16.1"
 rapl-energy = { git = "https://github.com/JordyAaldering/rapl-energy.git" }
 rayon = "1.10.0"
