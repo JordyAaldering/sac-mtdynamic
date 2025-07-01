@@ -38,8 +38,8 @@ bench()
         }' >> "results_sel265k/power_rust_stencil.csv"
 }
 
-for threads in 1 8; do
-  for size in 1000 2500; do
+for threads in 8; do
+  for size in 10000 25000; do
     printf "%d %d" $threads $size
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power 0
@@ -52,7 +52,7 @@ done
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
 
-for size in 500 1000; do
+for size in 10000 25000; do
   printf "%d %d" $threads $size
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4

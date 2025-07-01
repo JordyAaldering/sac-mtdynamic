@@ -52,7 +52,7 @@ done
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
 
-for size in 500 1000; do
+for size in 5000 10000; do
   printf "%d %d" $threads $size
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4
