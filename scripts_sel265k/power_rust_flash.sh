@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=30
+ITER=50
 HEAD_DIM=64
 
 (
@@ -40,7 +40,7 @@ bench()
 }
 
 for threads in 8; do
-  for size in 2048 4096; do
+  for size in 2048; do # 4096
     printf "%d %d" $threads $size
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power 0
@@ -52,8 +52,9 @@ done
 
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
+sleep 2
 
-for size in 2048 4096; do
+for size in 2048; do # 4096
   printf "%d %d" $threads $size
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4
