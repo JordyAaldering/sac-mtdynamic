@@ -21,9 +21,9 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl -C 0-$(($threads-1)) ./rust/target/release/flash 1 $HEAD_DIM $seq_length 1 > /dev/null
+    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/flash 1 $HEAD_DIM $seq_length 1 > /dev/null
 
-    numactl -C 0-$(($threads-1)) ./rust/target/release/flash $ITER $HEAD_DIM $seq_length $threads \
+    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/flash $ITER $HEAD_DIM $seq_length $threads \
         | awk -v size=$seq_length -v threads=$threads -v powercap=$power -v bg=$bg '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
