@@ -12,6 +12,7 @@ bench()
     threads=$1
     sequence_length=$2
     power=$3
+    bg=$4
 
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_0_power_limit_uw
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
@@ -20,14 +21,14 @@ bench()
     numactl -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads 1 $size > /dev/null
 
     numactl -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads $ITER $HEAD_DIM $sequence_length \
-        | awk -v size=$sequence_length -v threads=$threads -v powercap=$power '{
+        | awk -v size=$sequence_length -v threads=$threads -v powercap=$power -v bg=$bg '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
                 a[i] = b[i];
             }
         } END {
-            printf "%d %d %d", size, threads, powercap;
+            printf "%d %d %d %d", size, threads, bg, powercap;
             for (i = 2; i <= NF; i++) {
                 printf " %f %f", a[i], sqrt(q[i] / NR);
             }
@@ -38,7 +39,18 @@ bench()
 for threads in 1 8; do
   for sequence_length in 1024 8192; do
     for power in {12500000..125000000..12500000}; do
-      bench $threads $sequence_length $power
+      bench $threads $sequence_length $power 0
     done
   done
 done
+
+# With background load of 4 threads, on any of the 8 performance cores
+stress-ng -c 4 --taskset 0-7 &
+
+for size in 500 1500; do
+  for power in {12500000..125000000..12500000}; do
+    bench 8 $size $power 4
+  done
+done
+
+killall stress-ng
