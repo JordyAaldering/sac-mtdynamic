@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=20
+ITER=30
 
 make bin/matmul_transp_mt || exit 1
 
@@ -17,7 +17,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl --interleave all -C 0-$(($threads-1)) ./bin/matmul_transp_mt -mt $threads 1 $size > /dev/null
+    numactl --interleave all -C 0-$(($threads-1)) ./bin/matmul_transp_mt -mt $threads 5 $size > /dev/null
 
     numactl --interleave all -C 0-$(($threads-1)) ./bin/matmul_transp_mt -mt $threads $ITER $size \
         | awk -v size=$size -v threads=$threads -v powercap=$power -v bg=$bg '{
@@ -35,8 +35,8 @@ bench()
         }' >> "results_sel265k/power_sac_matmul_transp.csv"
 }
 
-for threads in 1 8; do
-  for size in 1500 3000; do
+for threads in 8; do
+  for size in 500 1500; do
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power 0
     done
@@ -46,7 +46,7 @@ done
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
 
-for size in 1500 3000; do
+for size in 500 1500; do
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4
   done

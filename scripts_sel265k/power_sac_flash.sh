@@ -18,7 +18,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl --interleave all -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads 1 $size > /dev/null
+    numactl --interleave all -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads 5 $size > /dev/null
 
     numactl --interleave all -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads $ITER $HEAD_DIM $seq_length \
         | awk -v size=$seq_length -v threads=$threads -v powercap=$power -v bg=$bg '{

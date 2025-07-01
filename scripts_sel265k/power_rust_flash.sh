@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=50
+ITER=20
 HEAD_DIM=64
 
 (
@@ -21,7 +21,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/flash 1 $HEAD_DIM $seq_length 1 > /dev/null
+    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/flash 5 $HEAD_DIM $seq_length $threads > /dev/null
 
     numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/flash $ITER $HEAD_DIM $seq_length $threads \
         | awk -v size=$seq_length -v threads=$threads -v powercap=$power -v bg=$bg '{
@@ -40,7 +40,7 @@ bench()
 }
 
 for threads in 8; do
-  for size in 2048; do # 4096
+  for size in 2048 4096; do
     printf "%d %d" $threads $size
     for power in {12500000..125000000..12500000}; do
       bench $threads $size $power 0
@@ -54,7 +54,7 @@ done
 stress-ng -c 4 --taskset 0-7 &
 sleep 2
 
-for size in 2048; do # 4096
+for size in 2048 4096; do
   printf "%d %d" $threads $size
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4

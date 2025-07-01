@@ -20,7 +20,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/nbody 1 $size $threads > /dev/null
+    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/nbody 5 $size $threads > /dev/null
 
     numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/nbody $ITER $size $threads \
         | awk -v size=$size -v threads=$threads -v powercap=$power -v bg=$bg '{
@@ -38,7 +38,7 @@ bench()
         }' >> "results_sel265k/power_rust_nbody.csv"
 }
 
-for threads in 8; do
+for threads in 1 8; do
   for size in 5000 15000; do
     printf "%d %d" $threads $size
     for power in {12500000..125000000..12500000}; do

@@ -20,7 +20,7 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/stencil 1 $size $threads > /dev/null
+    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/stencil 5 $size $threads > /dev/null
 
     numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/stencil $ITER $size $threads \
         | awk -v size=$size -v threads=$threads -v powercap=$power -v bg=$bg '{
