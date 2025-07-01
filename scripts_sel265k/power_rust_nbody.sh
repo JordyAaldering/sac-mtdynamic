@@ -38,7 +38,7 @@ bench()
         }' >> "results_sel265k/power_rust_nbody.csv"
 }
 
-for threads in 1 8; do
+for threads in 8; do
   for size in 5000 10000; do
     printf "%d %d" $threads $size
     for power in {12500000..125000000..12500000}; do

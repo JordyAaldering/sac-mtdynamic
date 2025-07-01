@@ -10,7 +10,7 @@ mkdir -p results_sel265k
 bench()
 {
     threads=$1
-    sequence_length=$2
+    seq_length=$2
     power=$3
     bg=$4
 
@@ -20,8 +20,8 @@ bench()
     # Warmup
     numactl -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads 1 $size > /dev/null
 
-    numactl -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads $ITER $HEAD_DIM $sequence_length \
-        | awk -v size=$sequence_length -v threads=$threads -v powercap=$power -v bg=$bg '{
+    numactl -C 0-$(($threads-1)) ./bin/flash_mt -mt $threads $ITER $HEAD_DIM $seq_length \
+        | awk -v size=$seq_length -v threads=$threads -v powercap=$power -v bg=$bg '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;
                 q[i] += ($i - a[i]) * ($i - b[i]);
@@ -47,7 +47,7 @@ done
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
 
-for size in 500 1500; do
+for size in 1024 8192; do
   for power in {12500000..125000000..12500000}; do
     bench 8 $size $power 4
   done
