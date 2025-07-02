@@ -1,5 +1,5 @@
 SAC ?= sac2c
-SAC_FLAGS = -maxwlur 9 -Xc -Ofast
+SAC_FLAGS = -maxwlur 9
 MT_FLAGS = -t mt_pth
 
 bin/%_mt: src/%.sac host/mt-pth/libBenchMod.so
