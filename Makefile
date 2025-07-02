@@ -2,6 +2,8 @@ SAC ?= sac2c
 SAC_FLAGS = -maxwlur 9
 MT_FLAGS = -t mt_pth
 
+.PRECIOUS: host/mt-pth/lib%Mod.so
+
 bin/%_mt: src/%.sac host/mt-pth/libBenchMod.so
 	$(SAC) ${MT_FLAGS} $(SAC_FLAGS) $< -o $@
 
