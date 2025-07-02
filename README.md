@@ -13,3 +13,14 @@ docker run -it --rm --name=mtdynamic \
     --privileged \
     mtdynamic
 ```
+
+## Running the benchmarking scripts and closing the container afterwards
+
+```
+docker run --rm --name=mtdynamic \
+    --mount type=bind,source=${PWD},target=/home/ubuntu/ \
+    --mount type=bind,source=/sys/class/powercap/intel-rapl,target=/sys/class/powercap/intel-rapl \
+    --privileged \
+    mtdynamic
+    ./bench_power_all.sh
+```
