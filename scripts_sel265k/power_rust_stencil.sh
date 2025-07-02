@@ -51,6 +51,7 @@ done
 
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
+sleep 1
 
 for size in 5000 15000; do
   printf "%d %d" $threads $size
@@ -62,3 +63,4 @@ for size in 5000 15000; do
 done
 
 killall stress-ng
+sleep 1

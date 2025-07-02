@@ -46,6 +46,7 @@ done
 
 # With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
+sleep 1
 
 for size in 2048 4096; do
   for power in {12500000..125000000..12500000}; do
@@ -54,3 +55,4 @@ for size in 2048 4096; do
 done
 
 killall stress-ng
+sleep 1
