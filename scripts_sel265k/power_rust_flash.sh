@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ITER=30
+ITER=50
 HEAD_DIM=64
 
 (
