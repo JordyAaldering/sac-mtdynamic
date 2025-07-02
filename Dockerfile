@@ -14,7 +14,7 @@ RUN apt update \
     && apt autoclean \
     && apt --purge autoremove
 
-WORKDIR /home/ubuntu
+WORKDIR /
 
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -34,3 +34,5 @@ ADD "https://api.github.com/repos/JordyAaldering/mtdynamic/commits?per_page=1" m
 RUN git clone --single-branch https://github.com/JordyAaldering/mtdynamic.git \
     && cd mtdynamic \
     && LOCAL="/usr/local" make install
+
+WORKDIR /home/ubuntu
