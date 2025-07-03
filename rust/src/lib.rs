@@ -18,6 +18,15 @@ pub struct MtdIterator<I: Iterator> {
     region_start: Option<(Instant, Rapl)>,
 }
 
+pub fn get_args() -> (usize, usize, usize) {
+    let args: Vec<_> = std::env::args().collect();
+    let argc = args.len();
+    let num_threads: usize = args[argc - 3].parse().unwrap();
+    let iter: usize = args[argc - 2].parse().unwrap();
+    let size: usize = args[argc - 1].parse().unwrap();
+    (num_threads, iter, size)
+}
+
 impl<I: Iterator> MtdIterator<I> {
     pub fn new(inner: I) -> Self {
         let counter = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);

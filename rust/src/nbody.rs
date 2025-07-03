@@ -3,7 +3,6 @@ use std::hint::black_box;
 use std::ops::{Add, Sub, Mul, AddAssign, SubAssign};
 
 use rayon::prelude::*;
-use shared::MtdIterator;
 
 #[derive(Clone, Debug)]
 struct Body {
@@ -96,10 +95,7 @@ fn time_step(bodies: &mut Vec<Body>, dt: f64) {
 }
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    let iter: usize = args[1].parse().unwrap();
-    let size: usize = args[2].parse().unwrap();
-    let num_threads: usize = args[3].parse().unwrap();
+    let (num_threads, iter, size) = shared::get_args();
 
     rayon::ThreadPoolBuilder::new().num_threads(num_threads).build_global().unwrap();
 
@@ -111,7 +107,7 @@ fn main() {
         }
     }).collect();
 
-    for _ in MtdIterator::new(0..iter) {
+    for _ in shared::MtdIterator::new(0..iter) {
         black_box(time_step(&mut bodies, 0.01));
     }
 }

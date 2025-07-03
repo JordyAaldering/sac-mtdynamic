@@ -21,6 +21,12 @@ docker run --rm --name=mtdynamic \
     --mount type=bind,source=${PWD},target=/home/ubuntu/ \
     --mount type=bind,source=/sys/class/powercap/intel-rapl,target=/sys/class/powercap/intel-rapl \
     --privileged \
-    mtdynamic
+    mtdynamic \
     ./bench_power_all.sh
+```
+
+## Copy output
+
+```
+scp jordy@sel-265k:~/sac-mtdynamic/results_sel265k/*.csv results_sel265k
 ```

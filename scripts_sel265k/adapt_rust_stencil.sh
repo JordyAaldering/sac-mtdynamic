@@ -16,8 +16,8 @@ cargo build --release
 )
 
 # Warmup
-numactl --interleave all -C 0-7 ./rust/target/release/stencil 10 $size 8 > /dev/null
+numactl --interleave all -C 0-7 ./rust/target/release/stencil -mt 8 10 $size > /dev/null
 
 ./start_server/genetic.sh &
 sleep 1 # Wait for server to be ready
-numactl --interleave all -C 0-7 ./rust/target/release/stencil $iter $size 8
+numactl --interleave all -C 0-7 ./rust/target/release/stencil -mt 8 $iter $size

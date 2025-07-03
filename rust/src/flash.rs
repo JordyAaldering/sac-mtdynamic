@@ -3,6 +3,8 @@ use std::hint::black_box;
 use ndarray::{Array2, Array3, Axis, s};
 use rayon::prelude::*;
 
+const D: usize = 64;
+
 fn stabilise(x: &Array2<f32>) -> Array2<f32> {
     let max_vals = x.map_axis(Axis(1), |row| row.fold(f32::NEG_INFINITY, |a, &b| a.max(b)));
     x - &max_vals.insert_axis(Axis(1))
@@ -48,17 +50,13 @@ fn flash_attention(
 }
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    let iter: usize = args[1].parse().unwrap();
-    let d: usize = args[2].parse().unwrap();
-    let n: usize = args[3].parse().unwrap();
-    let num_threads: usize = args[4].parse().unwrap();
+    let (num_threads, iter, size) = shared::get_args();
 
     rayon::ThreadPoolBuilder::new().num_threads(num_threads).build_global().unwrap();
 
-    let q = Array3::from_shape_fn((n / d, d, d), |(i, _, _)| 1.0 / (1.0 + i as f32));
-    let k = Array2::from_elem((n, d), 1.0);
-    let v = Array2::from_elem((n, d), 1.0);
+    let q = Array3::from_shape_fn((size / D, D, D), |(i, _, _)| 1.0 / (1.0 + i as f32));
+    let k = Array2::from_elem((size, D), 1.0);
+    let v = Array2::from_elem((size, D), 1.0);
 
     for _ in shared::MtdIterator::new(0..iter) {
         black_box(flash_attention(&q, &k, &v));

@@ -20,9 +20,9 @@ bench()
     echo $power > /sys/class/powercap/intel-rapl/intel-rapl:0/constraint_1_power_limit_uw
 
     # Warmup
-    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/nbody 5 $size $threads > /dev/null
+    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/nbody -mt $threads 5 $size > /dev/null
 
-    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/nbody $ITER $size $threads \
+    numactl --interleave all -C 0-$(($threads-1)) ./rust/target/release/nbody -mt $threads $ITER $size \
         | awk -v size=$size -v threads=$threads -v powercap=$power -v bg=$bg '{
             for (i = 2; i <= NF; i++) {
                 b[i] = a[i] + ($i - a[i]) / NR;

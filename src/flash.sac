@@ -2,6 +2,8 @@ use Array: all;
 use CommandLine: all;
 use StdIO: all;
 
+#define D 64
+
 inline
 float[m,n] stabilise(float[m,n] x)
 {
@@ -42,13 +44,12 @@ float[Nd,d,d] FlashAttention(float[Nd,d,d] Q, float[N,d] K, float[N,d] V)
 
 int main()
 {
-    iter = String::toi(argv(argc() - 3));
-    d = String::toi(argv(argc() - 2));
-    n = String::toi(argv(argc() - 1));
+    iter = String::toi(argv(argc() - 2));
+    size = String::toi(argv(argc() - 1));
 
-    Q = { [i, j, k] -> tof(1) / (tof(1) + tof(i)) | [i, j, k] < [n / d, d, d] };
-    K = { [i, j]    -> tof(1)                     | [i, j] < [n, d] };
-    V = { [i, j]    -> tof(1)                     | [i, j] < [n, d] };
+    Q = { [i, j, k] -> tof(1) / (tof(1) + tof(i)) | [i, j, k] < [size / D, D, D] };
+    K = { [i, j]    -> tof(1)                     | [i, j] < [size, D] };
+    V = { [i, j]    -> tof(1)                     | [i, j] < [size, D] };
 
     for (i = 0; i < iter; i += 1) {
         sec, nsec, rapl = Bench::start();
