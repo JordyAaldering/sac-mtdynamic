@@ -37,14 +37,15 @@ bench()
 
 bench_range()
 {
-  bin=$1
-  threads=$2
-  size=$3
-  bg=$4
+  name=$1
+  bin=$2
+  threads=$3
+  size=$4
+  bg=$5
 
   printf "%d %d" $threads $size
   for power in {4500000..45000000..4500000}; do
-    bench $bin $threads $size $power $bg
+    bench $name $bin $threads $size $power $bg
     printf "."
   done
   printf "\n"
