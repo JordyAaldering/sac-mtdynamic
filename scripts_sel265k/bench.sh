@@ -4,11 +4,12 @@ ITER=${ITER:-20}
 
 bench()
 {
-  bin=$1
-  threads=$2
-  size=$3
-  power=$4
-  bg=$5
+  name=$1
+  bin=$2
+  threads=$3
+  size=$4
+  power=$5
+  bg=$6
 
   echo $power > /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
   echo $power > /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
@@ -29,7 +30,7 @@ bench()
         printf " %f %f", a[i], sqrt(q[i] / NR);
       }
       print "";
-    }' >> "results_sel265k/power_rust_nbody.csv"
+    }' >> "results_sel265k/$name.csv"
 }
 
 bench_range()

@@ -32,7 +32,7 @@ bench()
         printf " %f %f", a[i], sqrt(q[i] / NR);
       }
       print "";
-    }' >> "results_omen/$name"
+    }' >> "results_omen/$name.csv"
 }
 
 bench_range()
