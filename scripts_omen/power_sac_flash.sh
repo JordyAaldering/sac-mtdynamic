@@ -8,7 +8,7 @@ make bin/flash_mt || exit 1
 
 mkdir -p results_omen
 
-for threads in 1 4; do
+for threads in 4; do
   for size in 2048 4096; do
     bench_range sac_flash bin/flash_mt $threads $size 0
   done

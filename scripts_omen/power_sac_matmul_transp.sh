@@ -6,7 +6,7 @@ make bin/matmul_transp_mt || exit 1
 
 mkdir -p results_omen
 
-for threads in 1 4; do
+for threads in 4; do
   for size in 500 1500; do
     bench_range sac_matmul_transp bin/matmul_transp_mt $threads $size 0
   done
