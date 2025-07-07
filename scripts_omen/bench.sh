@@ -12,11 +12,13 @@ bench()
 
   echo $power > /sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
   echo $power > /sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
+  echo $power > /sys/class/powercap/intel-rapl-mmio:0/constraint_0_power_limit_uw
+  echo $power > /sys/class/powercap/intel-rapl-mmio:0/constraint_1_power_limit_uw
 
   # Warmup
-  numactl --interleave all -C 0-$(($threads-1)) ./$bin -mt $threads 5 $size > /dev/null
+  numactl --interleave all -C 0,2,4,6 ./$bin -mt $threads 5 $size > /dev/null
 
-  numactl --interleave all -C 0-$(($threads-1)) ./$bin -mt $threads $ITER $size \
+  numactl --interleave all -C 0,2,4,6 ./$bin -mt $threads $ITER $size \
     | awk -v threads=$threads -v size=$size -v power=$power -v bg=$bg '{
       for (i = 2; i <= NF; i++) {
         b[i] = a[i] + ($i - a[i]) / NR;
@@ -40,7 +42,7 @@ bench_range()
   bg=$4
 
   printf "%d %d" $threads $size
-  for power in {12500000..125000000..12500000}; do
+  for power in {4500000..45000000..4500000}; do
     bench $bin $threads $size $power $bg
     printf "."
   done
