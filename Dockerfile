@@ -28,11 +28,7 @@ RUN git clone --single-branch --recursive https://github.com/SacBase/sac-energy.
     && cmake -DTARGETS="seq;mt_pth" .. \
     && make
 
-# Check for changes on remote
-ADD "https://api.github.com/repos/JordyAaldering/mtdynamic/commits?per_page=1" mtdynamic.json
 # Install dynamic adaptation controller
-RUN git clone --single-branch https://github.com/JordyAaldering/mtdynamic.git \
-    && cd mtdynamic \
-    && LOCAL="/usr/local" make install
+RUN curl -L https://github.com/JordyAaldering/mtdynamic/releases/download/main/server > /usr/local/bin/mtdynamic
 
 WORKDIR /home/ubuntu
