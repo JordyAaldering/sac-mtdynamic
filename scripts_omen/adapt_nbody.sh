@@ -12,9 +12,6 @@ size=$2
 
 make bin/nbody_mtd || exit 1
 
-# Warmup
-numactl --interleave all -C 0,2,4,6 ./bin/nbody_mtd -mt 4 10 $size
-
 ./start_server/genetic.sh &
 sleep 1 # Wait for server to be ready
 numactl --interleave all -C 0,2,4,6 ./bin/nbody_mtd -mt 4 $iter $size
