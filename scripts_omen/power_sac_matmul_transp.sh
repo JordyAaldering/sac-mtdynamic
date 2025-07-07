@@ -8,7 +8,7 @@ mkdir -p results_omen
 
 for threads in 1 4; do
   for size in 500 1500; do
-    bench_range bin/matmul_transp_mt $threads $size 0
+    bench_range sac_matmul_transp bin/matmul_transp_mt $threads $size 0
   done
 done
 
@@ -17,7 +17,7 @@ stress-ng -c 2 --taskset 0,2,4,6 &
 sleep 1
 
 for size in 500 1500; do
-  bench_range bin/matmul_transp_mt 4 $size 2
+  bench_range sac_matmul_transp bin/matmul_transp_mt 4 $size 2
 done
 
 killall stress-ng
