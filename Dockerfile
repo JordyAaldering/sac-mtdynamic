@@ -29,6 +29,7 @@ RUN git clone --single-branch --recursive https://github.com/SacBase/sac-energy.
     && make
 
 # Install dynamic adaptation controller
-RUN curl -L https://github.com/JordyAaldering/mtdynamic/releases/download/main/server > /usr/local/bin/mtdynamic
+RUN curl -L https://github.com/JordyAaldering/mtdynamic/releases/download/main/server > /usr/local/bin/mtdynamic \
+    && chmod +x /usr/local/bin/mtdynamic
 
 WORKDIR /home/ubuntu
