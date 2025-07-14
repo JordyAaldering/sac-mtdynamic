@@ -1,12 +1,8 @@
 #!/bin/bash
 
-ITER=50
-
 . ./scripts_sel265k/bench.sh
 
 make bin/flash_mt || exit 1
-
-mkdir -p results_sel265k
 
 for threads in 1 8; do
   for size in 2048 4096; do
@@ -14,7 +10,6 @@ for threads in 1 8; do
   done
 done
 
-# With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 4 --taskset 0-7 &
 sleep 1
 

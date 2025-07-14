@@ -2,6 +2,8 @@
 
 ITER=${ITER:-20}
 
+mkdir -p results_sel265k
+
 bench()
 {
   name=$1

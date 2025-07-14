@@ -2,6 +2,8 @@
 
 ITER=${ITER:-20}
 
+mkdir -p results_omen
+
 bench()
 {
   name=$1

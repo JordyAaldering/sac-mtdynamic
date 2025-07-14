@@ -1,12 +1,8 @@
 #!/bin/bash
 
-ITER=50
-
 . ./scripts_omen/bench.sh
 
 make bin/flash_mt || exit 1
-
-mkdir -p results_omen
 
 for threads in 4; do
   for size in 2048 4096; do
@@ -14,7 +10,6 @@ for threads in 4; do
   done
 done
 
-# With background load of 4 threads, on any of the 8 performance cores
 stress-ng -c 2 --taskset 0,2,4,6 &
 sleep 1
 
